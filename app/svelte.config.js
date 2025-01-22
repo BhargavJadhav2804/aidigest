@@ -4,7 +4,7 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 /** @type {import('@sveltejs/kit').Config}*/
 const config = {
 	preprocess: sequence([vitePreprocess(), preprocessMeltUI()]),
-
+	
 	kit: {
 		adapter: adapter({
 			routes: {
@@ -13,7 +13,7 @@ const config = {
 			},
 			platformProxy: {
 				configPath: 'wrangler.toml',
-				environment: 'node',
+				environment: undefined,
 				experimentalJsonConfig: false,
 				persist: false
 			}
