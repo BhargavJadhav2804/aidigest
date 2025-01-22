@@ -11,13 +11,21 @@
 	import { goto } from '$app/navigation';
 	import HowItWorks from '$lib/components/HowItWorks.svelte';
 
+	type result = {
+		id: number;
+		chatId: number;
+		createdAt: Date;
+		updatedAt: Date;
+		pageText: string;
+		embedding: number[];
+		metaData: unknown;
+	}[];
+
 	const {
 		elements: { trigger, portalled, overlay, content, title, description, close },
 		states: { open }
 	} = createDialog({
-		openFocus: '.dialog-elem',
-
-		defaultOpen: true
+		openFocus: '.dialog-elem'
 	});
 	let tween = new Tween(0, {
 		duration: 150,
@@ -49,7 +57,11 @@
 	let fileProcessed = $state(false);
 	let fileProcessing = $state(false);
 
-	let processedResult: null | {} = $state.raw(null);
+	let ytLink = $state('');
+
+	let processedResult: undefined | any[] = $state([]);
+
+	let generatingSummary = $state.raw(false);
 
 	let file = $derived.by(() => {
 		if (userFiles) {
@@ -71,10 +83,10 @@
 	let extractFile = async () => {
 		if (!worker || !file) return;
 
-		if (file.size / 1000000 >= 10) {
+		if (file.size / 5000000 >= 10) {
 			toast.set({
 				title: 'Error!',
-				description: 'File over 10MB are not accepted',
+				description: 'File over 50MB are not accepted',
 				color: 'red'
 			});
 		} else {
@@ -114,7 +126,7 @@
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-					pageContent: documentFile[i].pageContent,
+					pageContent: documentFile[i].pageContent.replaceAll('\u0000', ''),
 					metadata: documentFile[i].metadata.loc,
 					chatId: uniqueId
 				})
@@ -125,7 +137,7 @@
 			console.log(tween.target);
 			value.set(tween.target);
 
-			processedResult = res;
+			processedResult?.push(res.result);
 			console.log(res);
 		}
 		value.set(100);
@@ -134,14 +146,11 @@
 	};
 
 	$inspect({ userFiles, documentFile });
-</script>
 
-<svelte:head>
-	<link
-		href="https://api.fontshare.com/v2/css?f[]=satoshi@400&f[]=general-sans@400&f[]=chillax@400&display=swap"
-		rel="stylesheet"
-	/>
-</svelte:head>
+	$inspect('RESULT', processedResult[0]);
+
+	$inspect(ytLink);
+</script>
 
 {#if $open}
 	<div use:melt={$portalled}>
@@ -269,12 +278,32 @@
 						</button>
 					{:else if fileExtracted && fileProcessed}
 						<button
-							onclick={() => {
-								goto(`/chat/${processedResult ? processedResult?.result[0]?.chatId : "00000"}?summary`);
+							disabled={generatingSummary}
+							onclick={async () => {
+								generatingSummary = true;
+								await goto(
+									`/chat/${processedResult?.length !== 0 ? processedResult[0]?.[0].chatId : '00000'}?summary`
+								);
+								generatingSummary = false;
 							}}
-							class="rounded-xl bg-cyan-500 p-2 font-['Satoshi',sans-serif] text-lg text-stone-900"
+							class="flex items-center justify-between rounded-xl bg-cyan-500 p-2 font-['Satoshi',sans-serif] text-lg text-stone-900 transition-all"
 						>
 							Done! Generate summary and start chatting
+							{#if generatingSummary}
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="lucide lucide-loader-circle shrink-0 animate-spin"
+									><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg
+								>
+							{/if}
 						</button>
 					{/if}
 					<button
@@ -288,11 +317,33 @@
 			<b class=" font-chillax m-auto text-lg">OR</b>
 			<div class="flex flex-col gap-y-2">
 				<input
+					bind:value={
+						() => ytLink,
+						(v) => {
+							if (v?.length === 11) {
+								ytLink = `https://youtube.com/watch?v=${v}`;
+							} else if (v.length !== 11) {
+								ytLink = v;
+							}
+						}
+					}
 					type="text"
 					placeholder="Paste a youtube link or video ID"
 					class="font-satoshi w-full rounded-lg bg-stone-800 p-2 text-stone-300 outline-none"
 				/>
 				<button
+					onclick={async () => {
+						let chatId = generateRandom4ByteInteger();
+						let req = await fetch(`/chat/yt`, {
+							method: 'POST',
+							body: JSON.stringify({
+								ytLink,
+								chatId
+							})
+						});
+
+						await goto(`/chat/yt/${chatId}`)
+					}}
 					class="w-full cursor-pointer self-center rounded-xl bg-cyan-500 p-2 text-center font-['Satoshi',sans-serif] text-lg text-stone-900"
 				>
 					Proceed
@@ -300,6 +351,15 @@
 			</div>
 			<b class=" font-chillax m-auto text-lg">OR</b>
 			<button
+				onclick={async () => {
+					let req = await fetch(`/chat/normal?createChat=${generateRandom4ByteInteger()}`, {
+						method: 'POST'
+					});
+					let res = await req.json();
+
+					if (!req.ok) return;
+					goto(`/chat/normal/${res.chatId}`);
+				}}
 				class="cursor-pointer rounded-xl bg-cyan-500 p-2 text-center font-['Satoshi',sans-serif] text-lg text-stone-900"
 			>
 				Start a normal AI chat!
@@ -310,17 +370,17 @@
 
 <main class="min-h-svh w-full">
 	<div class="flex min-h-svh w-full justify-center">
-		<div class="flex min-h-full w-[85%] flex-col sm:w-[75%]">
+		<div class="mt-[4.35rem] flex min-h-full w-[90%] flex-col sm:w-[75%]">
 			<div class="flex w-full flex-col items-center">
 				<input
 					placeholder="Search for your chats"
 					type="text"
-					class=" font-satoshi mt-2 w-full rounded-lg bg-stone-900 p-3 text-stone-300"
+					class=" font-satoshi mt-2 w-full rounded-lg bg-stone-800 p-3 text-stone-300 outline outline-1 outline-stone-600"
 				/>
 
 				<div class="self-start">
 					<ul class="font-satoshi">
-						<li class="text-xl">No chats yet! Create one below</li>
+						<li class="text-heading text-xl">No chats yet! Create one below</li>
 					</ul>
 				</div>
 			</div>
@@ -328,7 +388,7 @@
 			<div class="flex h-full items-center justify-center">
 				<button
 					use:melt={$trigger}
-					class="cursor-pointer self-center rounded-xl bg-sky-500 p-3 text-lg [font-family:'General_Sans',sans-serif;] sm:text-xl"
+					class="font-generalSans cursor-pointer self-center rounded-xl bg-sky-500 p-3 text-lg sm:text-xl"
 				>
 					Start a new chat <b class="text-xl">+</b>
 				</button>

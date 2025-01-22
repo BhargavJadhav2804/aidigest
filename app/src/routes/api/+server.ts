@@ -1,46 +1,59 @@
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from "$lib/server/db"
-import { allChats, chats, documents } from '$lib/server/db/schema';
+import { chats, chatsOnDocuments, documents } from '$lib/server/db/schema';
 import { eq, sql } from 'drizzle-orm'
+import { API_KEY } from '$env/static/private';
 
 
 export const POST: RequestHandler = async ({ request }) => {
     const body = await request.json();
     const { pageContent, metadata, chatId } = body;
-    let req = await fetch('https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=AIzaSyDlLe0wUcEIF6TEOyTWvshCEqT0PgNG2bY', {
+    let req = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${API_KEY}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: `{"model":"models/text-embedding-004","content":{"parts":[{"text":"${pageContent}"}]},"outputDimensionality":"768"}`
     });
-    let res = await req.json()
+    let response = await req.json()
+    let newChatSet = false;
     try {
-
+        //TODO : Improve this logic
         let ifChatCreated = async () => {
-            let result = await db.select().from(allChats).where(eq(allChats.chatId, chatId))
+            let result = await db.select().from(chats).where(eq(chats.chatId, chatId))
             return result
         }
 
+        let actualChatId: number;
+
+
         let res = await ifChatCreated()
         if (res.length === 0) {
-            let newChats = await db.insert(allChats).values({
+            let newChats = await db.insert(chats).values({
                 chatId,
-                createdBy: '1000'
+                prompt: "SUMMARY_OF_THE_DOCUMENT",
+                response: "SAME_AS_SUMMARY",
+                userId: 10101,
+                sequence: 0
+            }).returning({id:chats.id})
 
-            })
+            actualChatId = newChats[0].id;
+        } else {
+            actualChatId = res[0].id;
         }
-    } catch (e) {
-        console.log('something went wrong : ', e)
-    }
 
 
-    try {
         let result = await db.insert(documents).values({
             pageText: pageContent,
-            embedding: res.embedding.values,
+            embedding: response.embedding.values,
             metaData: metadata,
             chatId
-        }).returning()
+        }).returning({ documentsId: documents.id,chatId:chats.chatId })
+
+        let docsInjoints = await db.insert(chatsOnDocuments).values({
+            chatId: actualChatId,
+            documentsId: result[0].documentsId
+        })
+
         return json({ result, pageContent });
 
     } catch (e: any) {

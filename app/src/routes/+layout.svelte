@@ -3,10 +3,14 @@
 	import { fly } from 'svelte/transition';
 	import '../app.css';
 	import '../global.css';
+	import '$lib/assets/fonts.css';
+	import NAV from '$lib/components/Nav.svelte';
 	import { bounceInOut, cubicInOut } from 'svelte/easing';
+	import { theme } from '$lib/utils.svelte';
 	let { children } = $props();
 </script>
 
+<NAV />
 {@render children()}
 
 {#if $toast}

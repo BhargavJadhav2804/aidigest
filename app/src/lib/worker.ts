@@ -3,12 +3,17 @@ import * as pdfjs from 'pdfjs-dist';
 import * as pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { WebPDFLoader } from '@langchain/community/document_loaders/web/pdf';
+import { GoogleAIFileManager } from "@google/generative-ai/server";
+
+
 
 
 pdfjs.GlobalWorkerOptions.workerSrc = import.meta.url + 'pdfjs-dist/build/pdf.worker.mjs';
 
 self.onmessage = async (e: { data: { file: File } }) => {
     let file = e.data.file
+
+    if (!file) return;
 
     const recursiveTextSplitter = new RecursiveCharacterTextSplitter({
         chunkSize: 1500,

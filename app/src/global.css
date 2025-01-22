@@ -1,3 +1,35 @@
+html[data-theme="light"] {
+    --bg-color: rgb(207, 250, 254);
+    --bg: linear-gradient(299deg, rgba(207, 250, 254, 1) 26%, rgba(219, 234, 254, 1) 71%);
+    --text-heading: #292524;
+    --text-chat: #1c1917;
+    --bg-chat: #e0f2fe;
+}
+
+html[data-theme="dark"] {
+    --bg-color: #1c1917;
+    --text-heading: #d6d3d1;
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 250ms;
+    --text-chat: #d6d3d1;
+    --bg-chat: #292524;
+
+}
+
+html[data-theme="light"] {
+    background-color: var(--bg-color);
+    background: var(--bg);
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 250ms;
+}
+
+
+html[data-theme="dark"] {
+    background-color: var(--bg-color)
+}
+
 @keyframes info-animation {
     from {
         opacity: 0;
@@ -40,10 +72,10 @@
     }
 }
 
-html {
+/* html {
     background: rgb(207, 250, 254);
     background: linear-gradient(299deg, rgba(207, 250, 254, 1) 26%, rgba(219, 234, 254, 1) 71%);
-}
+} */
 
 .tagline {
     transform: translateY(50px);

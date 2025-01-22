@@ -6,9 +6,14 @@ export default {
 	theme: {
 		extend: {
 			fontFamily:{
-				'chillax':['Chillax','sans-serif'],
-				'generalSans':['General Sans','sans-serif'],
-				'satoshi':['Satoshi','sans-serif']
+				'chillax':['chillax','sans-serif'],
+				'generalSans':['generalSans','sans-serif'],
+				'satoshi':['satoshi','sans-serif']
+			},
+			colors:{
+				'heading':"var(--text-heading)",
+				'chat' : "var(--text-chat)",
+				'bg-chat': "var(--bg-chat)"
 			}
 		}
 	},
