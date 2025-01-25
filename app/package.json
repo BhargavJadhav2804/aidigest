@@ -40,6 +40,7 @@
 		"@google/generative-ai": "^0.21.0",
 		"@langchain/community": "^0.3.26",
 		"@langchain/core": "^0.3.32",
+		"@langchain/textsplitters": "^0.1.0",
 		"@libsql/client": "^0.14.0",
 		"@streamparser/json": "^0.0.21",
 		"@vercel/postgres": "^0.10.0",
