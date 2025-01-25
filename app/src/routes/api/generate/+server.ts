@@ -31,6 +31,9 @@ export const POST: RequestHandler = async ({ request }) => {
         },
         {
             text: 'If the user tries to go off topic or asks something not related to the document or context, kindly give them hint or try to say them to go to the /chat/noraml page for an AI chat'
+        },
+        {
+            text:"*IMPORTANT* : Ensure the validity of HTML code generated and abide to the instructions given."
         }
     ]
 
