@@ -7,7 +7,7 @@ const config = {
 	
 	kit: {
 		adapter: adapter({
-			runtime:'edge'
+			runtime:'nodejs22.x'
 		})
 	}
 };
