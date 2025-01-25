@@ -1,4 +1,4 @@
-import { API_KEY } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import type { RequestHandler } from './$types';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
