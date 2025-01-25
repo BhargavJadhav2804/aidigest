@@ -1,5 +1,5 @@
 import type { RequestHandler } from './$types';
-import { API_KEY } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { db } from '$lib/server/db';
 import { chats } from '$lib/server/db/schema';
@@ -52,7 +52,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
         }
     ]
 
-    const genAI = new GoogleGenerativeAI(API_KEY);
+    const genAI = new GoogleGenerativeAI(env.API_KEY);
     const model = genAI?.getGenerativeModel({
         model: "gemini-1.5-flash", systemInstruction: {
             parts: system_instructions,

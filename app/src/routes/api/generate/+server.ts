@@ -1,5 +1,5 @@
 import type { RequestHandler } from './$types';
-import { API_KEY } from "$env/static/private"
+import { env } from "$env/dynamic/private"
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { db } from '$lib/server/db';
 import { chats } from '$lib/server/db/schema';
@@ -7,7 +7,7 @@ import { chats } from '$lib/server/db/schema';
 
 
 export const POST: RequestHandler = async ({ request }) => {
-    const genAI = new GoogleGenerativeAI(API_KEY);
+    const genAI = new GoogleGenerativeAI(env.API_KEY);
     let body = await request.json()
 
     const { summary, prompt, chatHistory, sequence, chatId } = body
@@ -31,6 +31,9 @@ export const POST: RequestHandler = async ({ request }) => {
         },
         {
             text: 'If the user tries to go off topic or asks something not related to the document or context, kindly give them hint or try to say them to go to the /chat/noraml page for an AI chat'
+        },
+        {
+            text:"*IMPORTANT* : Ensure the validity of HTML code generated and abide to the instructions given."
         }
     ]
 

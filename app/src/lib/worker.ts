@@ -7,7 +7,7 @@ import { WebPDFLoader } from '@langchain/community/document_loaders/web/pdf';
 
 
 pdfjs.GlobalWorkerOptions.workerSrc = import.meta.url + 'pdfjs-dist/build/pdf.worker.mjs';
-
+console.log("LOADED")
 self.onmessage = async (e: { data: { file: File } }) => {
     let file = e.data.file
 

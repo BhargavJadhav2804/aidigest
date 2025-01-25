@@ -3,13 +3,13 @@ import type { RequestHandler } from './$types';
 import { db } from "$lib/server/db"
 import { chats, chatsOnDocuments, documents } from '$lib/server/db/schema';
 import { eq, sql } from 'drizzle-orm'
-import { API_KEY } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 
 export const POST: RequestHandler = async ({ request }) => {
     const body = await request.json();
     const { pageContent, metadata, chatId } = body;
-    let req = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${API_KEY}`, {
+    let req = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${env.API_KEY}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: `{"model":"models/text-embedding-004","content":{"parts":[{"text":"${pageContent}"}]},"outputDimensionality":"768"}`

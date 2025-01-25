@@ -1,8 +1,7 @@
-import { YT_API_KEY } from '$env/static/private';
 import { db } from '$lib/server/db';
 import { chats } from '$lib/server/db/schema';
 import type { RequestHandler } from './$types';
-import { API_KEY } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { YoutubeLoader } from "@langchain/community/document_loaders/web/youtube";
 import { error, json, redirect } from '@sveltejs/kit';
@@ -82,7 +81,7 @@ export const POST: RequestHandler = async ({ url, request }) => {
 
     }
 
-    let videoData = await fetch(`https://www.googleapis.com/youtube/v3/videos?id=${id}&key=${YT_API_KEY}&part=snippet,id`)
+    let videoData = await fetch(`https://www.googleapis.com/youtube/v3/videos?id=${id}&key=${env.YT_API_KEY}&part=snippet,id`)
 
     let res = await videoData.json()
 
@@ -96,7 +95,7 @@ export const POST: RequestHandler = async ({ url, request }) => {
     })
 
 
-    const genAI = new GoogleGenerativeAI(API_KEY);
+    const genAI = new GoogleGenerativeAI(env.API_KEY);
     const model = genAI?.getGenerativeModel({
         model: "gemini-1.5-flash", systemInstruction: {
             parts: system_instructions,
