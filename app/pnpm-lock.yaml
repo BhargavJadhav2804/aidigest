@@ -38,6 +38,9 @@ importers:
       pdfjs-dist:
         specifier: ^4.10.38
         version: 4.10.38
+      postgres:
+        specifier: ^3.4.5
+        version: 3.4.5
       tesseract.js:
         specifier: ^6.0.0
         version: 6.0.0
@@ -4610,7 +4613,7 @@ snapshots:
       isstream: 0.1.2
       jsonwebtoken: 9.0.2
       mime-types: 2.1.35
-      retry-axios: 2.6.0(axios@1.7.4(debug@4.4.0))
+      retry-axios: 2.6.0(axios@1.7.4)
       tough-cookie: 4.1.4
     transitivePeerDependencies:
       - supports-color
@@ -5014,8 +5017,7 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  postgres@3.4.5:
-    optional: true
+  postgres@3.4.5: {}
 
   prettier-plugin-svelte@3.3.3(prettier@3.4.2)(svelte@5.19.1):
     dependencies:
@@ -5080,7 +5082,7 @@ snapshots:
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
 
-  retry-axios@2.6.0(axios@1.7.4(debug@4.4.0)):
+  retry-axios@2.6.0(axios@1.7.4):
     dependencies:
       axios: 1.7.4(debug@4.4.0)
 

@@ -3,8 +3,6 @@ import * as pdfjs from 'pdfjs-dist';
 import * as pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { WebPDFLoader } from '@langchain/community/document_loaders/web/pdf';
-import { GoogleAIFileManager } from "@google/generative-ai/server";
-
 
 
 
