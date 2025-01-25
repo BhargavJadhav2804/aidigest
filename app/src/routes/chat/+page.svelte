@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 	import { sleep, toast } from '$lib';
 	import { Tween } from 'svelte/motion';
-	import WORKER from "$lib/worker?worker"
+	import WORKER from "$lib/worker?url"
 
 	import { createDialog, createProgress, melt } from '@melt-ui/svelte';
 	import { fly } from 'svelte/transition';
@@ -46,7 +46,7 @@
 	let userFiles: null | FileList = $state(null);
 
 	onMount(() => {
-		worker = new WORKER();
+		worker = new Worker(WORKER,{type:'module'});
 	});
 
 	let fileExtracting = $state(false);
