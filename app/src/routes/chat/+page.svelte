@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 	import { sleep, toast } from '$lib';
 	import { Tween } from 'svelte/motion';
-	import WORKER from "../worker?worker"
+	import WORKER from "$lib/worker?worker"
 
 	import { createDialog, createProgress, melt } from '@melt-ui/svelte';
 	import { fly } from 'svelte/transition';
