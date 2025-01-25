@@ -7,6 +7,10 @@
 	import NAV from '$lib/components/Nav.svelte';
 	import { bounceInOut, cubicInOut } from 'svelte/easing';
 	import { theme } from '$lib/utils.svelte';
+	import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
+
+	injectSpeedInsights();
+	
 	let { children } = $props();
 </script>
 
