@@ -4,5 +4,8 @@ import { defineConfig } from 'vite';
 
 
 export default defineConfig({
-	plugins: [sveltekit(), enhancedImages()]
+	plugins: [sveltekit(), enhancedImages()],
+	worker:{
+			format:'es'
+	}
 });
