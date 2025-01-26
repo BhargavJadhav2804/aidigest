@@ -67,7 +67,8 @@
 	></div>
 </main>
 
-<style lang="postcss">
+<style scoped>
+@reference "../../../../app.css"
 	.chats :global(.chatSection) :global(h1) {
 		@apply text-chat text-xl md:text-2xl;
 	}
