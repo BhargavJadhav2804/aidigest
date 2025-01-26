@@ -43,7 +43,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
             "text": "Generate a response that is not only informative but also insightful and well-articulated. Consider the user's perspective and tailor the response accordingly. "
         },
         {
-            "text": "Ensure the validity of the HTML code generated, there should not be any invalid tags or elements or unwanted trailing brackets or commas (,)"
+            "text": "Ensure the validity of the HTML code generated, there should not be any invalid tags or elements or unwanted trailing brackets or commas (,) and empty/invalid HTML brackets (<>),etc"
         },
         {
             "text": "You'll be given the chat history of current and previous conversation for producing better tailored answers, the previous model answers or responses will be in HTML code, understand and analyze that in natural language"
@@ -79,6 +79,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
                 }
                 controller.close()
 
+                console.log('reached here')
                 let insertChats = await db.insert(chats).values({
                     prompt: userPrompt,
                     response: chunked.replaceAll('```html', '')

@@ -155,12 +155,12 @@
 
 {#if $open}
 	<div use:melt={$portalled}>
-		<div class="fixed inset-0 z-[2] bg-black/50" use:melt={$overlay} />
+		<div class="fixed inset-0 z-2 bg-black/50" use:melt={$overlay} />
 		<div
 			transition:fly={{ duration: 250, y: '25px' }}
 			use:melt={$content}
 			class="dialog-elem fixed left-1/2 top-1/2 z-50 flex max-h-[85vh] w-[90vw]
-            max-w-[450px] -translate-x-1/2 -translate-y-1/2 flex-col gap-y-4 rounded-xl bg-sky-200 p-3 focus:outline-none"
+            max-w-[450px] -translate-x-1/2 -translate-y-1/2 flex-col gap-y-4 rounded-xl bg-sky-200 p-3 focus:outline-hidden"
 		>
 			<div class="space-y-2">
 				<h1 use:melt={$title} class="font-['Satoshi',sans-serif] text-lg text-stone-900 sm:text-xl">
@@ -330,7 +330,7 @@
 					}
 					type="text"
 					placeholder="Paste a youtube link or video ID"
-					class="font-satoshi w-full rounded-lg bg-stone-800 p-2 text-stone-300 outline-none"
+					class="font-satoshi w-full rounded-lg bg-stone-800 p-2 text-stone-300 outline-hidden"
 				/>
 				<button
 					onclick={async () => {
