@@ -1,5 +1,5 @@
 <svg
-	class="absolute top-[50%] z-[1] h-full w-full translate-y-[-50%] opacity-[0.5]"
+	class="absolute top-[50%] z-1 h-full w-full translate-y-[-50%] opacity-[0.5]"
 	width="644"
 	height="546"
 	viewBox="0 0 644 546"

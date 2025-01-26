@@ -44,12 +44,12 @@
 >
 {#if $open}
 	<div use:melt={$portalled}>
-		<div class="fixed inset-0 z-[2] bg-black/50" use:melt={$overlay} />
+		<div class="fixed inset-0 z-2 bg-black/50" use:melt={$overlay} />
 		<div
 			transition:fly={{ duration: 250, y: '25px' }}
 			use:melt={$content}
 			class="dialog-elem fixed left-1/2 top-1/2 z-50 flex max-h-[85svh]
-        w-[90%] -translate-x-1/2 -translate-y-1/2 flex-col gap-y-6 space-y-4 self-start overflow-y-auto rounded-xl bg-sky-200 p-4 font-['Chillax',sans-serif;] focus:outline-none"
+        w-[90%] -translate-x-1/2 -translate-y-1/2 flex-col gap-y-6 space-y-4 self-start overflow-y-auto rounded-xl bg-sky-200 p-4 font-['Chillax',sans-serif;] focus:outline-hidden"
 		>
 			<div class=" flex flex-col items-center gap-y-8 text-lg sm:items-baseline sm:text-xl">
 				<p class="relative flex flex-col sm:block sm:self-start">

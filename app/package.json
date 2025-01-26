@@ -45,6 +45,7 @@
 		"@libsql/client": "^0.14.0",
 		"@neondatabase/serverless": "^0.10.4",
 		"@streamparser/json": "^0.0.21",
+		"@tailwindcss/vite": "^4.0.0",
 		"@vercel/postgres": "^0.10.0",
 		"@vercel/speed-insights": "^1.1.0",
 		"dompurify": "^3.2.3",

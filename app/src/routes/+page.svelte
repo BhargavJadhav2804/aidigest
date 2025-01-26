@@ -6,7 +6,7 @@
 <BG_SHAPES />
 <div class="bg-gradient absolute z-0 h-svh w-full"></div>
 <main class="flex min-h-svh w-full flex-col items-center justify-center">
-	<section class="text-heading z-[2] flex h-svh w-full items-center justify-center">
+	<section class="text-heading z-2 flex h-svh w-full items-center justify-center">
 		<div class="flex h-[75%] w-[90%] flex-col items-center justify-evenly">
 			<h1
 				class="tagline decoration-3 text-center text-[1.65rem] underline decoration-cyan-500 decoration-wavy underline-offset-4 [font-family:'Chillax',sans-serif;]
@@ -33,10 +33,10 @@ md:text-5xl"
 		</div>
 	</section>
 	
-	<section class="section-gradient text-heading z-[1] items-center flex min-h-svh w-full flex-col gap-y-12">
+	<section class="section-gradient text-heading z-1 items-center flex min-h-svh w-full flex-col gap-y-12">
 		<div class="flex sm:gap-x-4 h-svh w-full flex-col sm:items-stretch items-center justify-evenly gap-y-1 p-2 sm:flex-row">
 			<span
-				class="z-[2] flex w-full flex-col font-chillax sm:h-full sm:w-1/2 sm:flex-row sm:items-center sm:justify-center"
+				class="z-2 flex w-full flex-col font-chillax sm:h-full sm:w-1/2 sm:flex-row sm:items-center sm:justify-center"
 			>
 				<p class=" -blue-500 w-full text-2xl sm:text-3xl">
 					Condense information effortlessly! Our AI summarizes PDFs and YouTube videos, delivering

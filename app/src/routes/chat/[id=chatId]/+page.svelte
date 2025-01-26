@@ -100,7 +100,7 @@
 
 				let promptElem = document.createElement('div');
 				promptElem.className =
-					'bg-bg-chat text-chat h-fit w-[90%] self-end hyphens-auto text-wrap break-words rounded-b-2xl rounded-tl-2xl p-2 !text-lg outline outline-1 outline-stone-600 md:!text-xl';
+					'bg-bg-chat text-chat h-fit w-[90%] self-end hyphens-auto text-wrap break-words rounded-b-2xl rounded-tl-2xl p-2 text-lg! outline outline-1 outline-stone-600 md:text-xl!';
 
 				promptElem.textContent = prompt;
 				newChat = false;
@@ -111,7 +111,7 @@
 
 				let responseElement = document.createElement('div');
 				responseElement.className =
-					'bg-bg-chat text-chat h-fit w-[90%] self-start rounded-b-2xl rounded-tr-2xl p-2 !text-lg outline outline-1 outline-lime-500 md:!text-xl hidden';
+					'bg-bg-chat text-chat h-fit w-[90%] self-start rounded-b-2xl rounded-tr-2xl p-2 text-lg! outline outline-1 outline-lime-500 md:text-xl! hidden';
 
 				let req = await fetch('/api/generate', {
 					method: 'POST',
@@ -173,11 +173,11 @@
 				}
 			}}
 			bind:value
-			class="font-generalSans z-[2] max-h-[10rem] min-h-[4.5rem] w-[90%] resize-y rounded-t-lg bg-stone-900 px-3 py-2 text-stone-300 outline outline-2 outline-stone-600 sm:w-[90%]"
+			class="font-generalSans z-2 max-h-[10rem] min-h-[4.5rem] w-[90%] resize-y rounded-t-lg bg-stone-900 px-3 py-2 text-stone-300 outline outline-2 outline-stone-600 sm:w-[90%]"
 			placeholder="Type something"
 		></textarea>
 	</div>
-	<div class="!font-satoshi chatPage text-heading mb-8 mt-[3.75rem] w-[90%] md:w-[85%]">
+	<div class="font-satoshi! chatPage text-heading mb-8 mt-[3.75rem] w-[90%] md:w-[85%]">
 		{@html data.allChats[0].summary?.replaceAll('```html', '').replaceAll('```', '')}
 	</div>
 	<div class="font-satoshi chats text-heading mb-[85px] flex w-[90%] flex-col gap-y-4">
@@ -187,13 +187,13 @@
 			{#each data.allChats as x}
 				<span
 					style:display={x.prompt === 'SUMMARY_OF_THE_DOCUMENT' ? 'none' : 'block'}
-					class="text-chat bg-bg-chat h-fit w-[95%] self-end hyphens-auto text-wrap break-words rounded-b-2xl rounded-tl-2xl p-2 !text-base outline outline-1 outline-stone-600 md:!text-xl"
+					class="text-chat bg-bg-chat h-fit w-[95%] self-end hyphens-auto text-wrap break-words rounded-b-2xl rounded-tl-2xl p-2 text-base! outline outline-1 outline-stone-600 md:text-xl!"
 				>
 					{x.prompt}
 				</span>
 				<span
 					style:display={x.response === 'SAME_AS_SUMMARY' ? 'none' : 'block'}
-					class="text-chat bg-bg-chat h-fit w-[95%] self-start rounded-b-2xl rounded-tr-2xl p-2 !text-base outline outline-1 outline-lime-500 md:!text-xl"
+					class="text-chat bg-bg-chat h-fit w-[95%] self-start rounded-b-2xl rounded-tr-2xl p-2 text-base! outline outline-1 outline-lime-500 md:text-xl!"
 				>
 					{@html x.response}
 				</span>
@@ -202,7 +202,9 @@
 	</div>
 </main>
 
-<style lang="postcss">
+<style scoped>
+@reference "../../../app.css";
+
 	.chatPage :global(h1) {
 		@apply !text-2xl md:!text-3xl;
 	}

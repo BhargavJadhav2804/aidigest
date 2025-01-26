@@ -26,7 +26,7 @@
 	});
 </script>
 
-<nav class="fixed z-[10] top-0 flex w-full justify-between {theme.theme==='dark' ? "bg-gradient-to-b from-stone-800/80 to-stone-800/10" : ''} p-1 py-2 backdrop-blur-sm">
+<nav class="fixed z-10 top-0 flex w-full justify-between {theme.theme==='dark' ? "bg-linear-to-b from-stone-800/80 to-stone-800/10" : ''} p-1 py-2 backdrop-blur-xs">
 	<LOGO />
 	<div class="flex items-center">
 		<button
