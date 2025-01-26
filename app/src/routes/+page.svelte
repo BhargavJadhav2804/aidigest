@@ -24,7 +24,7 @@ md:text-5xl"
 				</span>
 				<a href="/chat" class="contents">
 					<button
-						class="max-w-fit rounded-xl border-none bg-cyan-400 p-3 text-xl text-stone-800 font-generalSans"
+						class="max-w-fit cursor-pointer rounded-xl border-none bg-cyan-400 p-3 text-xl text-stone-800 font-generalSans"
 					>
 						Get started
 					</button>
@@ -69,7 +69,7 @@ md:text-5xl"
 			<span class=" font-['Chillax',sans-serif;] text-2xl sm:text-3xl"> Try it now! </span>
 			<a class="contents" href="/chat">
 				<button
-					class="max-w-fit text-stone-800 rounded-xl border-none bg-cyan-400 p-3 text-lg font-generalSans sm:text-xl"
+					class="max-w-fit cursor-pointer text-stone-800 rounded-xl border-none bg-cyan-400 p-3 text-lg font-generalSans sm:text-xl"
 				>
 					Get started
 				</button>

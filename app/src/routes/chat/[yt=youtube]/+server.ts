@@ -9,21 +9,7 @@ import { eq } from 'drizzle-orm';
 
 export const POST: RequestHandler = async ({ url, request }) => {
 
-    // let ifToCreateChat = url.searchParams.get('createYtChat') === null ? false : Number(url.searchParams.get('createYtChat'));
-
-    // if (ifToCreateChat) {
-    //     let req = await db.insert(chats).values({
-    //         chatId: ifToCreateChat,
-    //         prompt: 'FOR THE SYSTEM : Ignore this prompt',
-    //         sequence: 0,
-    //         response: 'FOR THE SYSTEM : Ignore this response',
-    //         userId: 10101
-    //     }).returning({ chatId: chats.chatId })
-
-    //     return json({ chatId: req[0].chatId })
-
-    // }
-
+    let ifToCreateChat = url.searchParams.get('createYtChat') === null ? false : Number(url.searchParams.get('createYtChat'));
 
     let body = await request.json()
 
@@ -35,6 +21,27 @@ export const POST: RequestHandler = async ({ url, request }) => {
         const match = url.match(id);
         return match ? match[1] : null;
     }
+
+    let ytId = ytLink.length === 11 ? ytLink : extractYoutubeId(ytLink)
+
+
+    if (ifToCreateChat) {
+        console.log('youtube ID:', ytId)
+        let req = await db.insert(chats).values({
+            chatId: ifToCreateChat,
+            prompt: 'FOR THE SYSTEM : Ignore this prompt',
+            sequence: 0,
+            response: 'FOR THE SYSTEM : Ignore this response',
+            userId: 10101,
+            ytId: ytId ?? null
+        }).returning({ chatId: chats.chatId })
+
+        return json({ chatId: req[0].chatId })
+
+    }
+
+
+
 
     console.log(ytLink, '\n', chatId, '\n', ytLink.length)
 
@@ -48,10 +55,10 @@ export const POST: RequestHandler = async ({ url, request }) => {
         text: "Answer the questions asked by the user in friendly and detailed manner."
     },
     {
-        text: "Analyze the user input and provide an valid HTML-formatted response that can be directly rendered or inserted in a div tag. Consider using a conversational tone and employ HTML elements like headings, lists, and code blocks to improve clarity and presentation."
+        text: "Analyze the user input and provide an valid HTML-formatted response that can be directly rendered or inserted in a div tag. Consider using a conversational tone and employ HTML elements like headings, lists, and code blocks to improve clarity and presentation, apply appropriate underline styles for headings or titles."
     },
     {
-        text: "Do not apply any color or font styles for the html content or elements. Make the list headings or subheadings and any keywords bold. Provide large spacings or sufficient margins between sections, lists, paragraphs and between subsquent paragraphs and headings, maintaining readability or visually appealing reading experience"
+        text: "Do not apply any color or font styles for the HTML content or elements. Make the list headings or subheadings and any keywords bold. Provide spacings or sufficient margins between sections, lists, subsquent paragraphs and headings, maintaining readability or visually appealing reading experience"
 
     },
     {
@@ -62,9 +69,8 @@ export const POST: RequestHandler = async ({ url, request }) => {
     let transcript;
 
     let snippets;
-    let id = ytLink.length === 11 ? ytLink : extractYoutubeId(ytLink)
 
-    if (!id) {
+    if (!ytId) {
         error(400, { message: 'Invalid youtube link' })
     }
 
@@ -78,10 +84,9 @@ export const POST: RequestHandler = async ({ url, request }) => {
         transcript = (await loader.load())[0].pageContent
     } catch {
         transcript = null
-
     }
 
-    let videoData = await fetch(`https://www.googleapis.com/youtube/v3/videos?id=${id}&key=${env.YT_API_KEY}&part=snippet,id`)
+    let videoData = await fetch(`https://www.googleapis.com/youtube/v3/videos?id=${ytId}&key=${env.YT_API_KEY}&part=snippet,id`)
 
     let res = await videoData.json()
 
@@ -91,7 +96,7 @@ export const POST: RequestHandler = async ({ url, request }) => {
     system_instructions.push({
         text: `VIDEO DATA : description :- ${snippets.description}, title :- ${snippets.title}, id :- ${snippets.id}`
     }, {
-        text: `VIDEO TRANSCRIPT : ${transcript ? transcript : 'NOT AVAILABLE FOR THIS VIDEO'}`
+        text: `VIDEO TRANSCRIPT : ${transcript ? transcript : 'NOT AVAILABLE FOR THIS VIDEO, DO NOT prompt or tell user about unavailability of transcript, instead try to find and create the summary based on other video data given and research on your own'}`
     })
 
 
@@ -102,7 +107,6 @@ export const POST: RequestHandler = async ({ url, request }) => {
             role: 'model'
         }
     });
-
 
 
     let summary = (await model.generateContent("Create")).response.text()
@@ -120,11 +124,12 @@ export const POST: RequestHandler = async ({ url, request }) => {
             ),
         sequence: 0,
         userId: 10101,
-        chatId: Number(chatId)
+        chatId: Number(chatId),
+        ytId: ytId ?? null
     }).returning({ chatId: chats.chatId })
 
 
-   // redirect(303, `/chat/yt/${req[0].chatId}`)
+    // redirect(303, `/chat/yt/${req[0].chatId}`)
 
 
 
@@ -164,6 +169,6 @@ export const POST: RequestHandler = async ({ url, request }) => {
     //     }
     // })
 
-    return json({snippets,transcript})
+    return json({ snippets, transcript })
 
 };

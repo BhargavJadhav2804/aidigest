@@ -87,6 +87,7 @@
 
 				let prompt = value;
 
+				newChat = false;
 				chatHistory.push({
 					role: 'user',
 					parts: [
@@ -155,8 +156,6 @@
 
 					responseElement.innerHTML = DOMPurify.sanitize(textTorender);
 					window.scrollTo(0, document.body.scrollHeight);
-		
-					
 
 					if (done) {
 						chatHistory.push({
@@ -181,19 +180,19 @@
 		{@html data.allChats[0].summary?.replaceAll('```html', '').replaceAll('```', '')}
 	</div>
 	<div class="font-satoshi chats text-heading mb-[85px] flex w-[90%] flex-col gap-y-4">
-		{#if data.allChats.length === 1 || newChat}
+		{#if newChat}
 			<h1 class="text-heading m-auto">No chats yet!</h1>
 		{:else if data.allChats.length > 1}
 			{#each data.allChats as x}
 				<span
 					style:display={x.prompt === 'SUMMARY_OF_THE_DOCUMENT' ? 'none' : 'block'}
-					class="text-chat bg-bg-chat h-fit w-[95%] self-end hyphens-auto text-wrap break-words rounded-b-2xl rounded-tl-2xl p-2 text-base! outline outline-1 outline-stone-600 md:text-xl!"
+					class="text-chat bg-bg-chat text-base! md:text-xl! h-fit w-[95%] self-end hyphens-auto text-wrap break-words rounded-b-2xl rounded-tl-2xl p-2 outline outline-1 outline-stone-600"
 				>
 					{x.prompt}
 				</span>
 				<span
 					style:display={x.response === 'SAME_AS_SUMMARY' ? 'none' : 'block'}
-					class="text-chat bg-bg-chat h-fit w-[95%] self-start rounded-b-2xl rounded-tr-2xl p-2 text-base! outline outline-1 outline-lime-500 md:text-xl!"
+					class="text-chat bg-bg-chat text-base! md:text-xl! h-fit w-[95%] self-start rounded-b-2xl rounded-tr-2xl p-2 outline outline-1 outline-lime-500"
 				>
 					{@html x.response}
 				</span>
@@ -203,7 +202,7 @@
 </main>
 
 <style scoped>
-@reference "../../../app.css";
+	@reference "../../../app.css";
 
 	.chatPage :global(h1) {
 		@apply !text-2xl md:!text-3xl;
@@ -215,6 +214,6 @@
 		@apply !text-base md:!text-lg;
 	}
 	.chatPage :global(div) {
-		@apply hyphens-auto text-pretty break-words;
+		@apply font-satoshi! hyphens-auto text-pretty break-words;
 	}
 </style>

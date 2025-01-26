@@ -17,7 +17,7 @@ toast.subscribe((value) => {
     if (value !== null) {
         to = setTimeout(() => {
             toast.set(null)
-        }, 60000)
+        }, 5500)
     }
 })
 
