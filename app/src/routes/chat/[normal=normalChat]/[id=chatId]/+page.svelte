@@ -183,7 +183,7 @@
 	</div>
 </main>
 
-<style>
+<style scoped>
 @reference "../../../../app.css";
 
 	.chats :global(.chatSection) :global(h1) {

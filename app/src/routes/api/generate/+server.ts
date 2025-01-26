@@ -34,6 +34,9 @@ export const POST: RequestHandler = async ({ request }) => {
         },
         {
             text:"*IMPORTANT* : Ensure the validity of HTML code generated and abide to the instructions given."
+        },
+        {
+            text:"Do not prompt or tell user that you produce HTML code as response, be a professional yet friendly AI summarizer and assistant."
         }
     ]
 

@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 	import { sleep, toast } from '$lib';
 	import { Tween } from 'svelte/motion';
-	import WORKER from "$lib/worker?worker"
+	import WORKER from '$lib/worker?worker';
 
 	import { createDialog, createProgress, melt } from '@melt-ui/svelte';
 	import { fly } from 'svelte/transition';
@@ -151,16 +151,18 @@
 	$inspect('RESULT', processedResult[0]);
 
 	$inspect(ytLink);
+
+	let ytVideoLoading = $state(false);
 </script>
 
 {#if $open}
 	<div use:melt={$portalled}>
-		<div class="fixed inset-0 z-2 bg-black/50" use:melt={$overlay} />
+		<div class="z-2 fixed inset-0 bg-black/50" use:melt={$overlay} />
 		<div
 			transition:fly={{ duration: 250, y: '25px' }}
 			use:melt={$content}
-			class="dialog-elem fixed left-1/2 top-1/2 z-50 flex max-h-[85vh] w-[90vw]
-            max-w-[450px] -translate-x-1/2 -translate-y-1/2 flex-col gap-y-4 rounded-xl bg-sky-200 p-3 focus:outline-hidden"
+			class="dialog-elem focus:outline-hidden fixed left-1/2 top-1/2 z-50 flex max-h-[85vh]
+            w-[90vw] max-w-[450px] -translate-x-1/2 -translate-y-1/2 flex-col gap-y-4 rounded-xl bg-sky-200 p-3"
 		>
 			<div class="space-y-2">
 				<h1 use:melt={$title} class="font-['Satoshi',sans-serif] text-lg text-stone-900 sm:text-xl">
@@ -287,7 +289,7 @@
 								);
 								generatingSummary = false;
 							}}
-							class="flex items-center justify-between rounded-xl bg-cyan-500 p-2 font-['Satoshi',sans-serif] text-lg text-stone-900 transition-all"
+							class="flex items-center justify-evenly rounded-xl bg-cyan-500 p-2 font-['Satoshi',sans-serif] text-lg text-stone-900 transition-all"
 						>
 							Done! Generate summary and start chatting
 							{#if generatingSummary}
@@ -309,7 +311,7 @@
 					{/if}
 					<button
 						use:melt={$close}
-						class="rounded-xl bg-cyan-500 p-2 font-['Satoshi',sans-serif] text-lg text-stone-900"
+						class="font-satoshi cursor-pointer rounded-xl bg-cyan-500 p-2 text-lg text-stone-900"
 					>
 						Cancel
 					</button>
@@ -330,10 +332,11 @@
 					}
 					type="text"
 					placeholder="Paste a youtube link or video ID"
-					class="font-satoshi w-full rounded-lg bg-stone-800 p-2 text-stone-300 outline-hidden"
+					class="font-satoshi outline-hidden w-full rounded-lg bg-stone-800 p-2 text-stone-300"
 				/>
 				<button
 					onclick={async () => {
+						ytVideoLoading = true;
 						let chatId = generateRandom4ByteInteger();
 						let req = await fetch(`/chat/yt`, {
 							method: 'POST',
@@ -343,11 +346,37 @@
 							})
 						});
 
-						await goto(`/chat/yt/${chatId}`)
+						let res = await req.json();
+						if (!req.ok) {
+							ytVideoLoading = false;
+							toast.set({
+								title: 'Something went wrong ',
+								description: res?.message ?? 'Please try again'
+							});
+						} else {
+							ytVideoLoading = false;
+							await goto(`/chat/yt/${chatId}`);
+						}
 					}}
-					class="w-full cursor-pointer self-center rounded-xl bg-cyan-500 p-2 text-center font-['Satoshi',sans-serif] text-lg text-stone-900"
+					class="flex w-full cursor-pointer justify-center gap-x-4 items-center rounded-xl bg-cyan-500 p-2 text-center font-satoshi text-lg text-stone-900"
 				>
 					Proceed
+
+					{#if ytVideoLoading}
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="24"
+							height="24"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="lucide lucide-loader-circle shrink-0 animate-spin"
+							><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg
+						>
+					{/if}
 				</button>
 			</div>
 			<b class=" font-chillax m-auto text-lg">OR</b>

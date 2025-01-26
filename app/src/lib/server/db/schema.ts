@@ -1,4 +1,4 @@
-import { integer, json, pgTable, primaryKey, serial, text, timestamp, vector } from "drizzle-orm/pg-core";
+import { integer, json, pgTable, primaryKey, serial, text, timestamp, varchar, vector } from "drizzle-orm/pg-core";
 import { relations } from 'drizzle-orm';
 
 
@@ -28,12 +28,13 @@ export const chats = pgTable('chats', {
 	createdAt: timestamp('created_at').defaultNow().notNull(),
 	updatedAt: timestamp('updated_at').defaultNow().notNull(),
 	sequence: integer('sequence').notNull(),
+	ytId:varchar("ytVideoId",{length:11})
 })
 
 
 export const chatsOnDocuments = pgTable("chats_documents", {
-	chatId: integer("chat_id").notNull().references(() => chats.id),
-	documentsId: integer("documents_id").notNull().references(() => documents.id)
+	chatId: integer("chat_id").notNull().references(() => chats.id,{onDelete:'cascade'}),
+	documentsId: integer("documents_id").notNull().references(() => documents.id,{onDelete:'cascade'})
 
 }, (t) => [
 	primaryKey({ columns: [t.chatId, t.documentsId] })
