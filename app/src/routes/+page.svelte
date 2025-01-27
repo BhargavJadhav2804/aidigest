@@ -53,7 +53,7 @@ md:text-5xl"
 			/>
 		</div>
 		<div
-			class="flex h-svh w-full flex-col items-center justify-evenly gap-y-1 p-2 sm:flex-row-reverse sm:items-stretch sm:gap-x-4"
+			class="flex h-svh w-full flex-col items-center justify-evenly gap-y-2 p-2 sm:flex-row-reverse sm:items-stretch sm:gap-x-4"
 		>
 			<span
 				class=" -gray-800 font-chillax flex w-full flex-col sm:h-full sm:w-1/2 sm:flex-row sm:items-center sm:justify-center"
