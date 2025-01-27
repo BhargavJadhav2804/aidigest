@@ -2,6 +2,9 @@
 	import BG_SHAPES from '$lib/components/bg.svelte';
 </script>
 
+<svelte:head>
+	<title>Welcome to AIdigest | summarize and chat on the go!</title>
+</svelte:head>
 <BG_SHAPES />
 <div class="bg-gradient absolute z-0 h-svh w-full"></div>
 <main class="flex min-h-svh w-full flex-col items-center justify-center">
