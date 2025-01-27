@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { toast } from '$lib';
 	import { theme } from '$lib/utils.svelte';
 	import type { PageData } from './$types';
 	import DOMPurify from 'dompurify';
@@ -17,7 +18,7 @@
 
 	let streamDone = $state(true);
 
-	$inspect('stream done :',streamDone)
+	$inspect('stream done :', streamDone);
 	data.allChats.forEach((x) => {
 		chatHistory.push(
 			{
@@ -85,6 +86,11 @@
 		if (!req.ok) {
 			chatError = true;
 			currentSequence -= 1;
+			toast.set({
+				title: 'Something went wrong!',
+				description: 'Please try again'
+			});
+			console.log('YT_CHAT_ERROR:', await req.json());
 			return;
 		}
 
@@ -92,32 +98,39 @@
 
 		document.getElementsByClassName('chats')[0].appendChild(responseElement);
 		while (true) {
-			//@ts-expect-error
-			let { done, value } = await reader?.read();
+			try {
+				//@ts-expect-error
+				let { done, value } = await reader?.read();
 
-			let decode = new TextDecoder()
-				.decode(value)
-				.replaceAll('```html', '')
-				.replaceAll('```', '')
-				.replace('html', '')
-				.replaceAll('``', '');
+				let decode = new TextDecoder()
+					.decode(value)
+					.replaceAll('```html', '')
+					.replaceAll('```', '')
+					.replace('html', '')
+					.replaceAll('``', '');
 
-			textTorender += decode;
+				textTorender += decode;
 
-			responseElement.classList.remove('hidden');
+				responseElement.classList.remove('hidden');
 
-			responseElement.innerHTML = DOMPurify.sanitize(textTorender);
-			window.scrollTo(0, document.body.scrollHeight);
+				responseElement.innerHTML = DOMPurify.sanitize(textTorender);
+				window.scrollTo(0, document.body.scrollHeight);
 
-			if (done) {
-				console.log('Done!');
-				chatHistory.push({
-					role: 'model',
-					parts: [{ text: textTorender }]
+				if (done) {
+					console.log('Done!');
+					chatHistory.push({
+						role: 'model',
+						parts: [{ text: textTorender }]
+					});
+					streamDone = true;
+					textTorender = '';
+					break;
+				}
+			} catch (err) {
+				toast.set({
+					title: 'Something went wrong!',
+					description: 'Please try again'
 				});
-				streamDone = true;
-				textTorender = '';
-				break;
 			}
 		}
 	};
@@ -260,6 +273,9 @@
 		@apply rounded-md bg-stone-700 px-1;
 	}
 
+	.chats :global(.chatSection) {
+		@apply text-lg;
+	}
 	.summaryChat {
 		@apply space-y-3;
 	}

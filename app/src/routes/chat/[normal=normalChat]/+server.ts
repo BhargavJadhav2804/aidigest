@@ -3,7 +3,7 @@ import { env } from '$env/dynamic/private';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { db } from '$lib/server/db';
 import { chats } from '$lib/server/db/schema';
-import { json } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 
 
 export const POST: RequestHandler = async ({ request, url }) => {
@@ -43,12 +43,12 @@ export const POST: RequestHandler = async ({ request, url }) => {
             "text": "Generate a response that is not only informative but also insightful and well-articulated. Consider the user's perspective and tailor the response accordingly. "
         },
         {
-            "text": "Ensure the validity of the HTML code generated, there should not be any invalid tags or elements or unwanted trailing brackets or commas (,) and empty/invalid HTML brackets (<>),etc"
+            "text": "Ensure the validity of the HTML code generated, there should not be any invalid tags or elements or unwanted trailing brackets or commas (,) and empty/invalid HTML brackets like <>,etc"
         },
         {
             "text": "You'll be given the chat history of current and previous conversation for producing better tailored answers, the previous model answers or responses will be in HTML code, understand and analyze that in natural language"
-        },{
-            "text":"Provide underlines with appropriate offset for headings or subheadings of sections or lists or paragrapghs."
+        }, {
+            "text": "Provide underlines with appropriate offset for headings or subheadings of sections or lists or paragrapghs."
         }
     ]
 
@@ -71,25 +71,41 @@ export const POST: RequestHandler = async ({ request, url }) => {
         start(controller) {
             return pump()
             async function pump() {
-                for await (const chunk of response.stream) {
-                    let chunkText = chunk.text()
-                    chunked += chunkText
-                    controller.enqueue(chunkText)
+                try {
+                    for await (const chunk of response.stream) {
+                        try {
+                            let chunkText = chunk.text();
+                            chunked += chunkText;
+                            controller.enqueue(chunkText);
+                        } catch (chunkError) {
+                            console.error('Chunk processing error:', chunkError);
+                            controller.error(chunkError); // Propagate error to client
+                            break;
+                        }
+                    }
+                } catch (streamError) {
+                    console.error('Stream error:', streamError);
+                    controller.error(streamError); // Propagate error to client
+                } finally {
+                    controller.close(); // Always close the stream
 
+                    try {
+                        await db.insert(chats).values({
+                            prompt: userPrompt,
+                            response: chunked.replaceAll('```html', '')
+                                .replaceAll('```', '')
+                                .replace('html', '')
+                                .replaceAll('``', ''),
+                            userId: 10101,
+                            sequence,
+                            chatId
+                        });
+                        console.log('Database insert completed');
+                    } catch (dbError:any) {
+                        console.error('Database error:', dbError);
+                        error(400, { message: dbError.message ?? dbError.msg })
+                    }
                 }
-                controller.close()
-
-                console.log('reached here')
-                let insertChats = await db.insert(chats).values({
-                    prompt: userPrompt,
-                    response: chunked.replaceAll('```html', '')
-                        .replaceAll('```', '')
-                        .replace('html', '')
-                        .replaceAll('``', ''),
-                    userId: 10101,
-                    sequence,
-                    chatId
-                })
             }
 
         },

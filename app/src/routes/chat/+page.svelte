@@ -153,6 +153,8 @@
 	$inspect(ytLink);
 
 	let ytVideoLoading = $state(false);
+
+	let normalChatLoading = $state(false);
 </script>
 
 {#if $open}
@@ -193,14 +195,12 @@
 					<p>Please note that scanned files or pdf made with scanned images are not allowed.</p>
 				</span>
 				{#if userFiles}
-					<div
-						class="flex w-fit justify-around gap-x-6 rounded-lg p-2 outline outline-2 outline-lime-600"
-					>
+					<div class="flex w-fit justify-around gap-x-6 rounded-lg p-2 outline-2 outline-lime-600">
 						<div class="flex flex-col gap-y-1">
 							<h1 class="font-['Satoshi',sans-serif] italic text-stone-900">
 								{userFiles[0].name.length <= 20
 									? userFiles[0].name
-									: `${userFiles[0].name.slice(0, 20)}...`}
+									: `${userFiles[0].name.slice(0, 25)}...`}
 							</h1>
 
 							{#if totalPages}
@@ -273,11 +273,26 @@
 						<button
 							disabled={fileExtracting}
 							onclick={extractFile}
-							class="rounded-xl bg-cyan-500 p-2 font-['Satoshi',sans-serif] text-lg text-stone-900"
+							class="flex items-center justify-center gap-x-4 rounded-xl bg-cyan-500 p-2 font-['Satoshi',sans-serif] text-lg text-stone-900"
 						>
 							{fileExtracting
 								? 'Extracting text please wait, this may take a while depending on your file size'
 								: 'Proceed'}
+							{#if fileExtracting}
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="lucide lucide-loader-circle shrink-0 animate-spin"
+									><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg
+								>
+							{/if}
 						</button>
 					{:else if fileExtracted && fileProcessed}
 						<button
@@ -351,14 +366,16 @@
 							ytVideoLoading = false;
 							toast.set({
 								title: 'Something went wrong ',
-								description: res?.message ?? 'Please try again'
+								description: 'Please try again'
 							});
+							console.log(res?.message ?? res?.msg);
+							return;
 						} else {
 							ytVideoLoading = false;
 							await goto(`/chat/yt/${chatId}`);
 						}
 					}}
-					class="flex w-full cursor-pointer justify-center gap-x-4 items-center rounded-xl bg-cyan-500 p-2 text-center font-satoshi text-lg text-stone-900"
+					class="font-satoshi flex w-full cursor-pointer items-center justify-center gap-x-4 rounded-xl bg-cyan-500 p-2 text-center text-lg text-stone-900"
 				>
 					Proceed
 
@@ -381,18 +398,44 @@
 			</div>
 			<b class=" font-chillax m-auto text-lg">OR</b>
 			<button
+				disabled={normalChatLoading}
 				onclick={async () => {
+					normalChatLoading = true;
 					let req = await fetch(`/chat/normal?createChat=${generateRandom4ByteInteger()}`, {
 						method: 'POST'
 					});
 					let res = await req.json();
 
-					if (!req.ok) return;
-					goto(`/chat/normal/${res.chatId}`);
+					if (!req.ok) {
+						normalChatLoading = false;
+						toast.set({
+							title: 'Something went wrong while creating chat',
+							description: 'Please try again'
+						});
+						return;
+					}
+
+					await goto(`/chat/normal/${res.chatId}`);
+					normalChatLoading = false;
 				}}
-				class="cursor-pointer rounded-xl bg-cyan-500 p-2 text-center font-['Satoshi',sans-serif] text-lg text-stone-900"
+				class="font-satoshi flex cursor-pointer items-center justify-center gap-x-4 rounded-xl bg-cyan-500 p-2 text-center text-lg text-stone-900"
 			>
 				Start a normal AI chat!
+				{#if normalChatLoading}
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="24"
+						height="24"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						class="lucide lucide-loader-circle shrink-0 animate-spin"
+						><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg
+					>
+				{/if}
 			</button>
 		</div>
 	</div>
@@ -403,9 +446,10 @@
 		<div class="mt-[4.35rem] flex min-h-full w-[90%] flex-col sm:w-[75%]">
 			<div class="flex w-full flex-col items-center">
 				<input
+				disabled
 					placeholder="Search for your chats"
 					type="text"
-					class=" font-satoshi mt-2 w-full rounded-lg bg-stone-800 p-3 text-stone-300 outline outline-1 outline-stone-600"
+					class="font-satoshi mt-2 w-full rounded-lg bg-stone-800 p-3 text-stone-300 outline outline-1 outline-stone-600"
 				/>
 
 				<div class="self-start">

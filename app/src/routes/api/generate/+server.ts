@@ -3,6 +3,7 @@ import { env } from "$env/dynamic/private"
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { db } from '$lib/server/db';
 import { chats } from '$lib/server/db/schema';
+import { error } from '@sveltejs/kit';
 
 
 
@@ -33,10 +34,10 @@ export const POST: RequestHandler = async ({ request }) => {
             text: 'If the user tries to go off topic or asks something not related to the document or context, kindly give them hint or try to say them to go to the /chat/noraml page for an AI chat'
         },
         {
-            text:"*IMPORTANT* : Ensure the validity of HTML code generated and abide to the instructions given."
+            text: "*IMPORTANT* : Ensure the validity of HTML code generated and abide to the instructions given."
         },
         {
-            text:"Do not prompt or tell user that you produce HTML code as response, be a professional yet friendly AI summarizer and assistant."
+            text: "Do not prompt or tell user that you produce HTML code as response, be a professional yet friendly AI summarizer and assistant."
         }
     ]
 
@@ -106,37 +107,66 @@ export const POST: RequestHandler = async ({ request }) => {
         start(controller) {
             return pump();
             async function pump() {
-                // return reader?.read().then(({ done, value }) => {
-                //     // When no more data needs to be consumed, close the stream
-                //     if (done) {
-                //         controller.close();
-                //         return;
-                //     }
-                //     // Enqueue the next data chunk into our target stream
-                //     controller.enqueue(value);
-                //     return pump();
-                // });
-                for await (const chunk of result.stream) {
-                    const chunkText = chunk.text();
-                    chunked += chunkText
-                    controller.enqueue(chunkText);
-                }
-                controller.close()
+                // for await (const chunk of result.stream) {
+                //     const chunkText = chunk.text();
+                //     chunked += chunkText
+                //     controller.enqueue(chunkText);
+                // }
+                // controller.close()
 
-                let insertChats = await db.insert(chats).values({
-                    prompt,
-                    sequence,
-                    response: chunked.replaceAll('```html', '')
-                        .replaceAll('```', '')
-                        .replace('html', '')
-                        .replaceAll('``', '')
-                        .replaceAll(
-                            '/chat/normal',
-                            '<a href="/chat/normal" class="text-sky-600" > Special AI chat</a> '
-                        ),
-                    chatId,
-                    userId: 10101
-                })
+                // let insertChats = await db.insert(chats).values({
+                //     prompt,
+                //     sequence,
+                //     response: chunked.replaceAll('```html', '')
+                //         .replaceAll('```', '')
+                //         .replace('html', '')
+                //         .replaceAll('``', '')
+                //         .replaceAll(
+                //             '/chat/normal',
+                //             '<a href="/chat/normal" class="text-sky-600" > Special AI chat</a> '
+                //         ),
+                //     chatId,
+                //     userId: 10101
+                // })
+                try {
+                    for await (const chunk of result.stream) {
+                        try {
+                            let chunkText = chunk.text();
+                            chunked += chunkText;
+                            controller.enqueue(chunkText);
+                        } catch (chunkError) {
+                            console.error('Chunk processing error:', chunkError);
+                            controller.error(chunkError); // Propagate error to client
+                            break;
+                        }
+                    }
+                } catch (streamError) {
+                    console.error('Stream error:', streamError);
+                    controller.error(streamError); // Propagate error to client
+                } finally {
+                    controller.close(); // Always close the stream
+
+                    try {
+                        await db.insert(chats).values({
+                            prompt,
+                            response: chunked.replaceAll('```html', '')
+                                .replaceAll('```', '')
+                                .replace('html', '')
+                                .replaceAll('``', '')
+                                .replaceAll(
+                                    '/chat/normal',
+                                    '<a href="/chat/normal" class="text-sky-600" > Special AI chat</a> '
+                                ),
+                            userId: 10101,
+                            sequence,
+                            chatId
+                        });
+                        console.log('Database insert completed');
+                    } catch (dbError: any) {
+                        console.error('Database error:', dbError);
+                        error(400, { message: dbError.message ?? dbError.msg })
+                    }
+                }
             }
         },
         cancel() {
