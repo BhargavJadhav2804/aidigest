@@ -15,6 +15,8 @@
 	let currentSequence = $state(data.allChats[data.allChats.length - 1].sequence);
 	let newChat = $state(data.allChats.length === 1 ? true : false);
 
+	let streamDone = $state(true);
+
 	data.allChats.forEach((x) => {
 		chatHistory.push(
 			{
@@ -36,9 +38,10 @@
 		);
 	});
 
-	$inspect(chatHistory, '\n', data.allChats, '\n', currentSequence);
+	//$inspect(chatHistory, '\n', data.allChats, '\n', currentSequence);
 
 	let generateChat = async () => {
+		streamDone = false;
 		let userPrompt = prompt;
 		prompt = '';
 		console.log('USERPROMPT:', userPrompt);
@@ -116,6 +119,7 @@
 						parts: [{ text: textTorender }]
 					});
 					textTorender = '';
+					streamDone = true;
 					break;
 				}
 			} catch (err) {
@@ -142,7 +146,8 @@
 					//@ts-ignore
 					e.target.value += '\n';
 				} else if (e.key === 'Enter') {
-					console.log('Done!');
+					if (!prompt || prompt.length === 0) return;
+					if (!streamDone) return;
 					generateChat();
 				}
 			}}
@@ -157,6 +162,11 @@
 			id=""
 		></textarea>
 		<button
+			onclick={() => {
+				if (!prompt || prompt.length === 0) return;
+				if (!streamDone) return;
+				generateChat();
+			}}
 			aria-labelledby="Send"
 			class="block size-fit self-center rounded-full bg-stone-900 p-1 outline-1 outline-stone-700 peer-focus:outline sm:hidden"
 		>

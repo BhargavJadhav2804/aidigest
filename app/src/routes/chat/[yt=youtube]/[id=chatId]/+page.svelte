@@ -175,7 +175,9 @@
 		>
 	</div> -->
 	<div
-		class="z-2 sm:outline-hidden fixed bottom-0 flex w-full justify-between gap-x-2 outline-2 outline-stone-600 sm:justify-center"
+		class="z-2 fixed bottom-0 flex w-full justify-between {theme.theme === 'dark'
+			? 'bg-stone-900'
+			: 'bg-stone-800'} sm:outline-hidden gap-x-2 outline-2 outline-stone-600 sm:justify-center"
 	>
 		<textarea
 			onkeypress={async (e) => {
@@ -184,6 +186,7 @@
 					//@ts-ignore
 					e.target.value += '\n';
 				} else if (e.key === 'Enter') {
+					if (!prompt || prompt.length === 0) return;
 					if (!streamDone) return;
 					generateChat();
 				}
@@ -198,6 +201,31 @@
 				: 'bg-stone-800'} outline-hidden px-3 py-2 text-stone-300 focus:border-r sm:w-[85%] sm:rounded-t-lg sm:border sm:border-b-0 sm:border-x-stone-700 sm:border-t-stone-700"
 			id=""
 		></textarea>
+		<button
+			onclick={() => {
+				if (!prompt || prompt.length === 0) return;
+				if (!streamDone) return;
+				generateChat();
+			}}
+			aria-labelledby="Send"
+			class="block size-fit self-center rounded-full bg-stone-900 p-1 outline-1 outline-stone-700 peer-focus:outline sm:hidden"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				class="lucide lucide-send mt-1 size-8 rotate-[-44deg] stroke-stone-500 md:size-10"
+				><path
+					d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"
+				/><path d="m21.854 2.147-10.94 10.939" /></svg
+			></button
+		>
 	</div>
 	<div class="mt-[5rem] flex w-[90%] flex-col items-center gap-y-6 md:w-[80%]">
 		<iframe
