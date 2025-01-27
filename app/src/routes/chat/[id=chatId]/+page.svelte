@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { toast } from '$lib';
 	import type { PageData } from './$types';
 	let { data }: { data: PageData } = $props();
 
@@ -99,7 +100,7 @@
 
 				value = '';
 
-				let promptElem = document.createElement('div');
+				let promptElem = document.createElement('span');
 				promptElem.className =
 					'bg-bg-chat text-chat h-fit w-[90%] self-end hyphens-auto text-wrap break-words rounded-b-2xl rounded-tl-2xl p-2 text-lg! outline outline-1 outline-stone-600 md:text-xl!';
 
@@ -110,9 +111,9 @@
 
 				window.scrollTo(0, document.body.scrollHeight);
 
-				let responseElement = document.createElement('div');
+				let responseElement = document.createElement('span');
 				responseElement.className =
-					'bg-bg-chat text-chat h-fit w-[90%] self-start rounded-b-2xl rounded-tr-2xl p-2 text-lg! outline outline-1 outline-lime-500 md:text-xl! hidden';
+					'bg-bg-chat text-chat h-fit w-[90%] space-y-3 self-start rounded-b-2xl rounded-tr-2xl p-2 text-lg! outline outline-1 outline-lime-500 md:text-xl! hidden';
 
 				let req = await fetch('/api/generate', {
 					method: 'POST',
@@ -131,6 +132,12 @@
 				if (!req.ok) {
 					chatError = true;
 					currentSequence -= 1;
+					toast.set({
+						title: 'Something went wrong',
+						description: 'Please try again'
+					});
+
+					console.log('CHAT_ERROR:', await req.json());
 					return;
 				}
 
@@ -139,35 +146,43 @@
 				document.getElementsByClassName('chats')[0].appendChild(responseElement);
 
 				while (true) {
-					let { done, value } = await reader?.read();
-					let decode = new TextDecoder()
-						.decode(value)
-						.replaceAll('```html', '')
-						.replaceAll('```', '')
-						.replace('html', '')
-						.replaceAll('``', '')
-						.replaceAll(
-							'/chat/normal',
-							'<a href="/chat/normal" class="text-sky-600" > Special AI chat</a> '
-						);
+					try {
+						//@ts-expect-error
+						let { done, value } = await reader?.read();
+						let decode = new TextDecoder()
+							.decode(value)
+							.replaceAll('```html', '')
+							.replaceAll('```', '')
+							.replace('html', '')
+							.replaceAll('``', '')
+							.replaceAll(
+								'/chat/normal',
+								'<a href="/chat/normal" class="text-sky-600" > Special AI chat</a> '
+							);
 
-					responseElement.classList.remove('hidden');
-					textTorender += decode;
+						responseElement.classList.remove('hidden');
+						textTorender += decode;
 
-					responseElement.innerHTML = DOMPurify.sanitize(textTorender);
-					window.scrollTo(0, document.body.scrollHeight);
+						responseElement.innerHTML = DOMPurify.sanitize(textTorender);
+						window.scrollTo(0, document.body.scrollHeight);
 
-					if (done) {
-						chatHistory.push({
-							role: 'model',
-							parts: [
-								{
-									text: textTorender
-								}
-							]
+						if (done) {
+							chatHistory.push({
+								role: 'model',
+								parts: [
+									{
+										text: textTorender
+									}
+								]
+							});
+							textTorender = '';
+							break;
+						}
+					} catch (err) {
+						toast.set({
+							title: 'Something went wrong',
+							description: 'Please try again'
 						});
-						textTorender = '';
-						break;
 					}
 				}
 			}}
@@ -191,7 +206,7 @@
 					{x.prompt}
 				</span>
 				<span
-					style:display={x.response === 'SAME_AS_SUMMARY' ? 'none' : 'block'}
+					style:display={x.response === 'SAME_AS_SUMMARY' ? 'none' : 'inline-block'}
 					class="text-chat bg-bg-chat text-base! md:text-xl! h-fit w-[95%] self-start rounded-b-2xl rounded-tr-2xl p-2 outline outline-1 outline-lime-500"
 				>
 					{@html x.response}
@@ -201,7 +216,7 @@
 	</div>
 </main>
 
-<style scoped>
+<style>
 	@reference "../../../app.css";
 
 	.chatPage :global(h1) {
@@ -216,4 +231,5 @@
 	.chatPage :global(div) {
 		@apply font-satoshi! hyphens-auto text-pretty break-words;
 	}
+	
 </style>

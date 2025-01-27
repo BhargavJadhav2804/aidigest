@@ -2,7 +2,6 @@
 	import BG_SHAPES from '$lib/components/bg.svelte';
 </script>
 
-
 <BG_SHAPES />
 <div class="bg-gradient absolute z-0 h-svh w-full"></div>
 <main class="flex min-h-svh w-full flex-col items-center justify-center">
@@ -16,7 +15,7 @@ md:text-5xl"
 			</h1>
 			<div class="info flex flex-col items-center gap-y-6">
 				<span
-					class=" w-[85%] text-center text-lg leading-7 font-satoshi md:text-2xl md:leading-8"
+					class=" font-satoshi w-[95%] text-center text-lg leading-7 md:w-[85%] md:text-2xl md:leading-8"
 				>
 					Tired of spending hours on documents and videos? AI Digest uses powerful AI technology to
 					instantly provide clear, concise summaries, and lets you ask questions and chat with the
@@ -24,7 +23,7 @@ md:text-5xl"
 				</span>
 				<a href="/chat" class="contents">
 					<button
-						class="max-w-fit cursor-pointer rounded-xl border-none bg-cyan-400 p-3 text-xl text-stone-800 font-generalSans"
+						class="font-generalSans max-w-fit cursor-pointer rounded-xl border-none bg-cyan-400 p-3 text-xl text-stone-800"
 					>
 						Get started
 					</button>
@@ -32,11 +31,15 @@ md:text-5xl"
 			</div>
 		</div>
 	</section>
-	
-	<section class="section-gradient text-heading z-1 items-center flex min-h-svh w-full flex-col gap-y-12">
-		<div class="flex sm:gap-x-4 h-svh w-full flex-col sm:items-stretch items-center justify-evenly gap-y-1 p-2 sm:flex-row">
+
+	<section
+		class="section-gradient text-heading z-1 flex min-h-svh w-full flex-col items-center gap-y-12"
+	>
+		<div
+			class="flex h-svh w-full flex-col items-center justify-evenly gap-y-1 p-2 sm:flex-row sm:items-stretch sm:gap-x-4"
+		>
 			<span
-				class="z-2 flex w-full flex-col font-chillax sm:h-full sm:w-1/2 sm:flex-row sm:items-center sm:justify-center"
+				class="z-2 font-chillax flex w-full flex-col sm:h-full sm:w-1/2 sm:flex-row sm:items-center sm:justify-center"
 			>
 				<p class=" -blue-500 w-full text-2xl sm:text-3xl">
 					Condense information effortlessly! Our AI summarizes PDFs and YouTube videos, delivering
@@ -49,9 +52,11 @@ md:text-5xl"
 				alt="An alt text"
 			/>
 		</div>
-		<div class="flex sm:gap-x-4 h-svh w-full flex-col sm:items-stretch items-center justify-evenly gap-y-1 p-2 sm:flex-row-reverse">
+		<div
+			class="flex h-svh w-full flex-col items-center justify-evenly gap-y-1 p-2 sm:flex-row-reverse sm:items-stretch sm:gap-x-4"
+		>
 			<span
-				class=" -gray-800 flex w-full flex-col font-chillax sm:h-full sm:w-1/2 sm:flex-row sm:items-center sm:justify-center"
+				class=" -gray-800 font-chillax flex w-full flex-col sm:h-full sm:w-1/2 sm:flex-row sm:items-center sm:justify-center"
 			>
 				<p class=" -blue-500 w-full text-2xl sm:text-3xl">
 					Save time and boost your learning. AI Digest provides accurate summaries of PDFs and
@@ -61,7 +66,7 @@ md:text-5xl"
 			</span>
 			<enhanced:img
 				src="/static/man_with_phone.jpg"
-				class="block aspect-square size-[315px] rounded-xl sm:sticky sm:top-16 sm:size-[435px] md:[450px]"
+				class="md:[450px] block aspect-square size-[315px] rounded-xl sm:sticky sm:top-16 sm:size-[435px]"
 				alt="An alt text"
 			/>
 		</div>
@@ -69,7 +74,7 @@ md:text-5xl"
 			<span class=" font-['Chillax',sans-serif;] text-2xl sm:text-3xl"> Try it now! </span>
 			<a class="contents" href="/chat">
 				<button
-					class="max-w-fit cursor-pointer text-stone-800 rounded-xl border-none bg-cyan-400 p-3 text-lg font-generalSans sm:text-xl"
+					class="font-generalSans max-w-fit cursor-pointer rounded-xl border-none bg-cyan-400 p-3 text-lg text-stone-800 sm:text-xl"
 				>
 					Get started
 				</button>
