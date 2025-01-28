@@ -171,7 +171,7 @@
 			transition:fly={{ duration: 250, y: '25px' }}
 			use:melt={$content}
 			class="dialog-elem focus:outline-hidden fixed left-1/2 top-1/2 z-50 flex max-h-[85vh]
-            w-[90vw] max-w-[450px] overflow-y-auto -translate-x-1/2 -translate-y-1/2 flex-col gap-y-4 rounded-xl bg-sky-200 p-3"
+            w-[90vw] max-w-[450px] -translate-x-1/2 -translate-y-1/2 flex-col gap-y-4 overflow-y-auto rounded-xl bg-sky-200 p-3"
 		>
 			<div class="space-y-2">
 				<h1 use:melt={$title} class="font-['Satoshi',sans-serif] text-lg text-stone-900 sm:text-xl">
@@ -311,7 +311,7 @@
 								);
 								generatingSummary = false;
 							}}
-							class="flex items-center justify-evenly rounded-xl bg-cyan-500 p-2 font-satoshi text-lg text-stone-900 transition-all"
+							class="font-satoshi flex items-center justify-evenly rounded-xl bg-cyan-500 p-2 text-lg text-stone-900 transition-all"
 						>
 							Done! Generate summary and start chatting
 							{#if generatingSummary}
@@ -358,6 +358,7 @@
 				/>
 				<button
 					onclick={async () => {
+						if (!ytLink || ytLink.length === 0) return;
 						ytVideoLoading = true;
 						let chatId = generateRandom4ByteInteger();
 						let req = await fetch(`/chat/yt`, {
