@@ -83,11 +83,18 @@
 	console.log(generateRandom4ByteInteger());
 	let extractFile = async () => {
 		if (!worker || !file) return;
+		console.log(file.type);
 
 		if (file.size / 5000000 >= 10) {
 			toast.set({
 				title: 'Error!',
 				description: 'File over 50MB are not accepted',
+				color: 'red'
+			});
+		} else if (file.type !== 'application/pdf') {
+			toast.set({
+				title: 'Error!',
+				description: 'Only PDFs are accepted',
 				color: 'red'
 			});
 		} else {
@@ -164,7 +171,7 @@
 			transition:fly={{ duration: 250, y: '25px' }}
 			use:melt={$content}
 			class="dialog-elem focus:outline-hidden fixed left-1/2 top-1/2 z-50 flex max-h-[85vh]
-            w-[90vw] max-w-[450px] -translate-x-1/2 -translate-y-1/2 flex-col gap-y-4 rounded-xl bg-sky-200 p-3"
+            w-[90vw] max-w-[450px] -translate-x-1/2 -translate-y-1/2 flex-col gap-y-4 overflow-y-auto rounded-xl bg-sky-200 p-3"
 		>
 			<div class="space-y-2">
 				<h1 use:melt={$title} class="font-['Satoshi',sans-serif] text-lg text-stone-900 sm:text-xl">
@@ -192,7 +199,7 @@
 							y2="16"
 						/></svg
 					>
-					<p>Please note that scanned files or pdf made with scanned images are not allowed.</p>
+					<p>Please note that scanned files or pdf made with scanned images are not accepted.</p>
 				</span>
 				{#if userFiles}
 					<div class="flex w-fit justify-around gap-x-6 rounded-lg p-2 outline-2 outline-lime-600">
@@ -304,7 +311,7 @@
 								);
 								generatingSummary = false;
 							}}
-							class="flex items-center justify-evenly rounded-xl bg-cyan-500 p-2 font-['Satoshi',sans-serif] text-lg text-stone-900 transition-all"
+							class="font-satoshi flex items-center justify-evenly rounded-xl bg-cyan-500 p-2 text-lg text-stone-900 transition-all"
 						>
 							Done! Generate summary and start chatting
 							{#if generatingSummary}
@@ -351,6 +358,7 @@
 				/>
 				<button
 					onclick={async () => {
+						if (!ytLink || ytLink.length === 0) return;
 						ytVideoLoading = true;
 						let chatId = generateRandom4ByteInteger();
 						let req = await fetch(`/chat/yt`, {
@@ -446,7 +454,7 @@
 		<div class="mt-[4.35rem] flex min-h-full w-[90%] flex-col sm:w-[75%]">
 			<div class="flex w-full flex-col items-center">
 				<input
-				disabled
+					disabled
 					placeholder="Search for your chats"
 					type="text"
 					class="font-satoshi mt-2 w-full rounded-lg bg-stone-800 p-3 text-stone-300 outline outline-1 outline-stone-600"

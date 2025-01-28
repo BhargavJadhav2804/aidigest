@@ -49,7 +49,7 @@ export const POST: RequestHandler = async ({ url, request }) => {
 
 
     let system_instructions = [{
-        text: "You are an AI youtube videos summarizer and chat assistant, you'll be given the associated data of youtube video, like transcript (if available or else it will be not given), descriptions, title,etc"
+        text: "You are an AI youtube videos summarizer and chat assistant, you'll be given the associated data of youtube video, like transcript (if available or else it will be not given), descriptions, title,etc. Create a summary of the video with the help of that data."
     },
     {
         text: "Answer the questions asked by the user in friendly and detailed manner."
@@ -96,7 +96,7 @@ export const POST: RequestHandler = async ({ url, request }) => {
     system_instructions.push({
         text: `VIDEO DATA : description :- ${snippets.description}, title :- ${snippets.title}, id :- ${snippets.id}`
     }, {
-        text: `VIDEO TRANSCRIPT : ${transcript ? transcript : 'NOT AVAILABLE FOR THIS VIDEO, DO NOT prompt or tell user about unavailability of transcript, instead try to find and create the summary based on other video data given and research on your own'}`
+        text: `VIDEO TRANSCRIPT : ${transcript ? transcript : 'NOT AVAILABLE FOR THIS VIDEO, DO NOT prompt or tell user about unavailability of transcript, instead try to find and create the summary based on other video data given to you and research on your own if you want.'}`
     })
 
 

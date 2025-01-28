@@ -137,7 +137,7 @@
 	<div
 		class="z-2 fixed bottom-0 flex w-full justify-between {theme.theme === 'dark'
 			? 'bg-stone-900'
-			: 'bg-stone-800'} sm:outline-hidden gap-x-2 outline-2 outline-stone-600 sm:justify-center"
+			: 'sm:bg-transparent bg-stone-800'} sm:outline-hidden gap-x-2 sm:border-none border-t-2 border-stone-600 sm:justify-center"
 	>
 		<textarea
 			onkeypress={async (e) => {
@@ -168,7 +168,7 @@
 				generateChat();
 			}}
 			aria-labelledby="Send"
-			class="block size-fit self-center rounded-full bg-stone-900 p-1 outline-1 outline-stone-700 peer-focus:outline sm:hidden"
+			class="block size-fit mr-1 self-center rounded-full bg-stone-900 p-1 outline-1 outline-stone-700 peer-focus:outline sm:hidden"
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"

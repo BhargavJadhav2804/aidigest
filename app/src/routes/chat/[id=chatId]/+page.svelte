@@ -189,7 +189,7 @@
 	<div
 		class="z-2 fixed bottom-0 flex w-full justify-between {theme.theme === 'dark'
 			? 'bg-stone-900'
-			: 'bg-stone-800'} sm:outline-hidden gap-x-2 outline-2 outline-stone-600 sm:justify-center"
+			: 'sm:bg-transparent bg-stone-800'} sm:outline-hidden gap-x-2 sm:border-none border-t-2 border-stone-600 sm:justify-center"
 	>
 		<textarea
 			onkeypress={async (e) => {
@@ -199,7 +199,7 @@
 				generateChat();
 			}}
 			bind:value
-			class="font-generalSans z-2 max-h-[10rem] min-h-[4.5rem] w-[90%] resize-y rounded-t-lg bg-stone-900 px-3 py-2 text-stone-300 outline outline-2 outline-stone-600 sm:w-[90%]"
+			class="font-generalSans z-2 max-h-[10rem] min-h-[4.5rem] w-[90%] resize-y rounded-none sm:rounded-t-lg bg-stone-900 px-3 py-2 text-stone-300  outline-2 outline-stone-600 sm:w-[90%]"
 			placeholder="Type something"
 		></textarea>
 		<button
@@ -209,7 +209,7 @@
 				generateChat();
 			}}
 			aria-labelledby="Send"
-			class="block size-fit self-center rounded-full bg-stone-900 p-1 outline-1 outline-stone-700 peer-focus:outline sm:hidden"
+			class="block size-fit mr-1 self-center rounded-full bg-stone-900 p-1 outline-1 outline-stone-700 peer-focus:outline sm:hidden"
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -244,7 +244,7 @@
 				</span>
 				<span
 					style:display={x.response === 'SAME_AS_SUMMARY' ? 'none' : 'inline-block'}
-					class="text-chat bg-bg-chat text-base! md:text-xl! h-fit w-[95%] self-start rounded-b-2xl rounded-tr-2xl p-2 outline outline-1 outline-lime-500"
+					class="text-chat font-chillax bg-bg-chat text-base! md:text-xl! h-fit w-[95%] self-start rounded-b-2xl rounded-tr-2xl p-2 outline outline-lime-500"
 				>
 					{@html x.response}
 				</span>
