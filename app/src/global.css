@@ -6,6 +6,10 @@ html[data-theme="light"] {
     --bg-chat: #e0f2fe;
 }
 
+button{
+    cursor: pointer;
+}
+
 html[data-theme="dark"] {
     --bg-color: #1c1917;
     --text-heading: #d6d3d1;
