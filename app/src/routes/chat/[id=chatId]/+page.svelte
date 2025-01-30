@@ -98,7 +98,7 @@
 
 		let promptElem = document.createElement('span');
 		promptElem.className =
-			'bg-bg-chat text-chat h-fit w-[90%] self-end hyphens-auto text-wrap break-words rounded-b-2xl rounded-tl-2xl p-2 text-lg! outline outline-1 outline-stone-600 md:text-xl!';
+			'bg-bg-chat font-satoshi text-chat h-fit w-[90%] self-end hyphens-auto text-wrap break-words rounded-b-2xl rounded-tl-2xl p-2 text-lg! outline outline-1 outline-stone-600 md:text-xl!';
 
 		promptElem.textContent = prompt;
 		newChat = false;
@@ -109,7 +109,7 @@
 
 		let responseElement = document.createElement('span');
 		responseElement.className =
-			'bg-bg-chat text-chat h-fit w-[90%] space-y-3 self-start rounded-b-2xl rounded-tr-2xl p-2 text-lg! outline outline-1 outline-lime-500 md:text-xl! hidden';
+			'bg-bg-chat font-chillax text-chat h-fit w-[90%] space-y-3 self-start rounded-b-2xl rounded-tr-2xl p-2 text-lg! outline outline-1 outline-lime-500 md:text-xl! hidden';
 
 		let req = await fetch('/api/generate', {
 			method: 'POST',
@@ -238,7 +238,7 @@
 			{#each data.allChats as x}
 				<span
 					style:display={x.prompt === 'SUMMARY_OF_THE_DOCUMENT' ? 'none' : 'block'}
-					class="text-chat bg-bg-chat text-base! md:text-xl! h-fit w-[95%] self-end hyphens-auto text-wrap break-words rounded-b-2xl rounded-tl-2xl p-2 outline outline-1 outline-stone-600"
+					class="text-chat bg-bg-chat font-satoshi text-base! md:text-xl! h-fit w-[95%] self-end hyphens-auto text-wrap break-words rounded-b-2xl rounded-tl-2xl p-2 outline outline-stone-600"
 				>
 					{x.prompt}
 				</span>

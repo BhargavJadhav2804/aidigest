@@ -1,8 +1,10 @@
 import { env } from '$env/dynamic/private';
 import { db } from '$lib/server/db';
 import { chats } from '$lib/server/db/schema';
+import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { sys_instructions } from '$lib/server/db/sysInstructions';
 
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -13,40 +15,12 @@ export const POST: RequestHandler = async ({ request }) => {
 
 
     let system_instructions = [
-        { "text": "You are primarily an AI chatbot or assistant named aidigest who summarizes youtube videos, your primary work is to chat with user in friendly manner and give response to their prompts or answer their questions in well structured manner." },
-        { "text": "Analyze the user input and provide an valid HTML-formatted response that can be directly rendered or inserted in a div tag. Consider using a conversational tone and employ HTML elements like headings, lists, and code blocks to improve clarity and presentation." },
+        sys_instructions,
         {
-            "text": "If user asks to write or generate code, format the response inside appropriate code blocks and <pre> tags, the code inside should be clear and easily understandable, use conventional code styles."
+            text: `VIDEO SUMMARY : ${videoSummary}`
         },
         {
-            "text": "Do not apply any color or font styles for the html content or elements. Make the list headings or subheadings and any keywords bold. Provide large spacings or sufficient margins between sections, lists, paragraphs and between subsquent paragraphs and headings, maintaining readability or visually appealing reading experience"
-        },
-        {
-            "text": "Additional style instructions : Give appropriate underlines for titles or headings, with proper offsets."
-        },
-        {
-            "text": "Generate a response that is not only informative but also insightful and well-articulated. Consider the user's perspective and tailor the response accordingly. "
-        },
-        {
-            "text": "Ensure the validity of the HTML code generated, there should not be any invalid tags or elements or unwanted trailing brackets or commas (,) and empty/invalid HTML brackets (<>),etc"
-        },
-        {
-            "text": "You'll be given the chat history of current and previous conversation for producing better tailored answers, the previous model answers or responses will be in HTML code, understand and analyze that in natural language"
-        },
-        {
-            "text": "Provide underlines with appropriate offset for headings or subheadings of sections or lists or paragrapghs."
-        },
-        {
-            "text": `For more reference to answer user query you can consider and research on the youtube video link : https://youtube.com/watch?v=${ytVideoId}`
-        },
-        {
-            "text": `This is the summary of the video :${videoSummary} (It's given in HTML but understand and analyze in natural language) `
-        },
-        {
-            "text" : "If user asks questions or query about the video, refer to the summary and video link given  answer in proper manner."
-        },
-        {
-            "text" : " IMPORTANT : Use bold words or text for keywords, instead of ** ** character. Atlast, ensure the generated HTML is well validated and follows above instructions."
+            text: `VIDEO ID : ${ytVideoId}`
         }
     ]
 
@@ -59,40 +33,86 @@ export const POST: RequestHandler = async ({ request }) => {
     });
 
     let chunked = ''
-    console.log(chatHistory);
+
     let chat = model.startChat({
         history: chatHistory
     });
 
-    let response = await chat.sendMessageStream(userPrompt)
+    const abortController = new AbortController();
+
+    let response = await chat.sendMessageStream(userPrompt, {
+        signal: abortController.signal
+    })
+
+    let controllerClosed = false;
+    let faultyResponse = 0
     let stream = new ReadableStream({
-        start(controller) {
-            return pump()
-            async function pump() {
+        async pull(controller) {
+            try {
                 for await (const chunk of response.stream) {
+                    if (faultyResponse >= 3) {
+                        console.log('closing due to faulty response')
+                        controller.close()
+                        controllerClosed = true;
+                        break;
+                    }
+
                     let chunkText = chunk.text()
                     chunked += chunkText
-                    controller.enqueue(chunkText)
+                    controller.enqueue(chunkText);
 
+                    if (chunkText.length === 96) {
+                        faultyResponse += 1
+                    } else {
+                        faultyResponse = 0
+                    }
+
+                    console.log("IN THE LOOP \n")
                 }
-                controller.close()
-                console.log('stream done')
-                let insertChats = await db.insert(chats).values({
-                    prompt: userPrompt,
-                    response: chunked.replaceAll('```html', '')
-                        .replaceAll('```', '')
-                        .replace('html', '')
-                        .replaceAll('``', ''),
-                    userId: 10101,
-                    sequence,
-                    chatId
-                })
+                console.log("OUTSIDE THE LOOP \n")
 
-                console.log('chats inserted')
+                if (!controllerClosed && !abortController.signal.aborted) {
+                    controller.close()
+                    controllerClosed = true
+                }
+
+            } catch (streamError) {
+                console.error('Stream error:', streamError);
+                controller.error(streamError); // Propagate error to client
+                if (!abortController.signal.aborted && !controllerClosed) {
+                    abortController.abort()
+                    error(500, { message: "Stream error occured" })
+                }
+            } finally {
+                console.log('STREAM DONE \n')
+
+                if (!abortController.signal.aborted && controllerClosed) {
+                    try {
+                        let insertChats = await db.insert(chats).values({
+                            prompt: userPrompt,
+                            response: chunked.replaceAll('```html', '')
+                                .replaceAll('```', '')
+                                .replace('html', '')
+                                .replaceAll('``', ''),
+                            userId: 10101,
+                            sequence,
+                            chatId
+                        })
+                    } catch (dbError: any) {
+                        console.error('Database error:', dbError);
+                        error(400, { message: dbError.message ?? dbError.msg })
+                    }
+                }
+                console.log('CHATS INSERTED \n')
+
             }
+
 
         },
         cancel() {
+            console.log('Stream cancelled by client');
+            abortController.abort();
+            error(500, { message: "Stream cancelled by client" })
 
         }
     })

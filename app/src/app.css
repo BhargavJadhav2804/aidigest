@@ -9,6 +9,7 @@
   --color-heading: var(--text-heading);
   --color-chat: var(--text-chat);
   --color-bg-chat: var(--bg-chat);
+  --color-code-chat:var(--code-chat);
 }
 
 /*

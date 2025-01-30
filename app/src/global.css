@@ -4,9 +4,10 @@ html[data-theme="light"] {
     --text-heading: #292524;
     --text-chat: #1c1917;
     --bg-chat: #e0f2fe;
+    --code-chat: #d6d3d1;
 }
 
-button{
+button {
     cursor: pointer;
 }
 
@@ -18,7 +19,7 @@ html[data-theme="dark"] {
     transition-duration: 250ms;
     --text-chat: #d6d3d1;
     --bg-chat: #292524;
-
+    --code-chat: #d6d3d1;
 }
 
 html[data-theme="light"] {

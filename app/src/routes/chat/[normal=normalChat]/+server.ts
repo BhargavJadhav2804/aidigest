@@ -61,34 +61,57 @@ export const POST: RequestHandler = async ({ request, url }) => {
     });
 
     let chunked = ''
-    console.log(chatHistory);
+
+    let faultyResponse = 0
+
     let chat = model.startChat({
         history: chatHistory
     });
 
-    let response = await chat.sendMessageStream(userPrompt)
-    let stream = new ReadableStream({
-        start(controller) {
-            return pump()
-            async function pump() {
-                try {
-                    for await (const chunk of response.stream) {
-                        try {
-                            let chunkText = chunk.text();
-                            chunked += chunkText;
-                            controller.enqueue(chunkText);
-                        } catch (chunkError) {
-                            console.error('Chunk processing error:', chunkError);
-                            controller.error(chunkError); // Propagate error to client
-                            break;
-                        }
-                    }
-                } catch (streamError) {
-                    console.error('Stream error:', streamError);
-                    controller.error(streamError); // Propagate error to client
-                } finally {
-                    controller.close(); // Always close the stream
+    let abortController = new AbortController()
 
+    let controllerClosed = false;
+
+    let response = await chat.sendMessageStream(userPrompt, {
+        signal: abortController.signal
+    })
+    let stream = new ReadableStream({
+        async pull(controller) {
+            try {
+                for await (const chunk of response.stream) {
+                    if (faultyResponse >= 3) {
+                        console.log('closing due to faulty response')
+                        controller.close()
+                        controllerClosed = true;
+                        break;
+                    }
+
+                    let chunkText = chunk.text();
+                    chunked += chunkText;
+                    controller.enqueue(chunkText);
+
+                    if (chunkText.length === 96) {
+                        faultyResponse += 1
+                    } else {
+                        faultyResponse = 0
+                    }
+
+                }
+            } catch (streamError) {
+                console.error('Stream error:', streamError);
+                controller.error(streamError); // Propagate error to client
+                if (!abortController.signal.aborted && !controllerClosed) {
+                    abortController.abort();
+                    error(500, { message: "Stream error occured" })
+
+                }
+            } finally {
+                if (!controllerClosed && !abortController.signal.aborted) {
+                    controller.close()
+                    controllerClosed = true
+                }
+
+                if (!abortController.signal.aborted) {
                     try {
                         await db.insert(chats).values({
                             prompt: userPrompt,
@@ -100,17 +123,20 @@ export const POST: RequestHandler = async ({ request, url }) => {
                             sequence,
                             chatId
                         });
-                        console.log('Database insert completed');
-                    } catch (dbError:any) {
+                        console.log('CHATS INSERTED');
+                    } catch (dbError: any) {
                         console.error('Database error:', dbError);
                         error(400, { message: dbError.message ?? dbError.msg })
                     }
                 }
             }
 
+
         },
         cancel() {
-
+            console.log('Stream cancelled by client');
+            abortController.abort();
+            error(500, { message: "Stream cancelled by client" })
         }
     })
 
