@@ -240,11 +240,11 @@
 		@apply w-full overflow-x-auto rounded-lg bg-stone-800 p-1;
 	}
 	.chats :global(.chatSection) :global(pre code) {
-		@apply !overflow-x-scroll bg-transparent;
+		@apply !overflow-x-scroll bg-transparent text-code-chat;
 	}
 
 	.chats :global(.chatSection) :global(code) {
-		@apply rounded-md bg-stone-700 px-1;
+		@apply rounded-md bg-stone-700 px-1 text-code-chat;
 	}
 	.chats :global(.chatSection) :global(section) {
 		@apply mb-4 mt-4;
