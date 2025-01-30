@@ -316,4 +316,10 @@
 	.summaryChat :global(h2) {
 		@apply text-xl;
 	}
+	.chats :global(.chatSection) :global(div > *) {
+		@apply mt-3 mb-3;
+	}
+	.chats :global(.chatSection) :global(div ul) {
+		@apply ml-3;
+	}
 </style>
