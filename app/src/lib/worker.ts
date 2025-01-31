@@ -25,6 +25,16 @@ self.onmessage = async (e: { data: { file: File } }) => {
     let tokens = await recursiveTextSplitter.splitDocuments(docs);
     if (tokens.length === 0) {
         self.postMessage({ processDone: false })
+        // let form = new FormData()
+        // form.append('file', file)
+        // form.append("fileName", file.name.slice(0, 25))
+
+        // let req = await fetch('/api/uploadPdf', {
+        //     method: "POST",
+        //     body: form
+        // })
+
+        // console.log(await req.json())
     } else {
         let totalPages = tokens[tokens.length - 1].metadata.loc.pageNumber
         self.postMessage({ processDone: true, document: tokens, totalPages })
