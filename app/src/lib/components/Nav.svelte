@@ -31,7 +31,7 @@
 		? 'bg-linear-to-b from-stone-800/80 to-stone-800/10'
 		: ''} backdrop-blur-xs p-1 py-2"
 >
-	<div class="flex gap-x-3 items-center">
+	<div class="flex gap-x-4 items-center">
 		<LOGO />
 
 		<span class="rounded-lg bg-indigo-500 px-2 py-1 font-satoshi"> BETA </span>
