@@ -26,8 +26,16 @@
 	});
 </script>
 
-<nav class="fixed z-10 top-0 flex w-full justify-between {theme.theme==='dark' ? "bg-linear-to-b from-stone-800/80 to-stone-800/10" : ''} p-1 py-2 backdrop-blur-xs">
-	<LOGO />
+<nav
+	class="fixed top-0 z-10 flex w-full justify-between {theme.theme === 'dark'
+		? 'bg-linear-to-b from-stone-800/80 to-stone-800/10'
+		: ''} backdrop-blur-xs p-1 py-2"
+>
+	<div class="flex gap-x-3 items-center">
+		<LOGO />
+
+		<span class="rounded-lg bg-indigo-500 px-2 py-1 font-satoshi"> BETA </span>
+	</div>
 	<div class="flex items-center">
 		<button
 			use:melt={$root}
