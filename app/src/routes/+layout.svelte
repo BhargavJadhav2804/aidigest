@@ -6,7 +6,6 @@
 	import '$lib/assets/fonts.css';
 	import NAV from '$lib/components/Nav.svelte';
 	import { bounceInOut } from 'svelte/easing';
-	import { hideWarning } from '$lib/utils.svelte';
 	import { injectAnalytics } from '@vercel/analytics/sveltekit';
 
 	injectAnalytics();
