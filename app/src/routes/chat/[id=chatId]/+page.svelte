@@ -1,16 +1,20 @@
 <script lang="ts">
 	import { toast } from '$lib';
 	import { theme } from '$lib/utils.svelte';
+	import { fly } from 'svelte/transition';
 	import type { PageData } from './$types';
 	let { data }: { data: PageData } = $props();
 
 	import DOMPurify from 'dompurify';
+	import { cubicInOut } from 'svelte/easing';
 
 	let value: string = $state('');
 
 	let chatHistory: { role: 'user' | 'model'; parts: Array<{ text: string }> }[] = $state([]);
 	let currentSequence = $state(data.allChats[data.allChats.length - 1].sequence);
 	let newChat = $state(data.allChats.length === 1 ? true : false);
+
+	let isDocumentBottom = $state(false);
 
 	let streamDone = $state(true);
 
@@ -141,6 +145,13 @@
 
 		document.getElementsByClassName('chats')[0].appendChild(responseElement);
 
+		window.scrollTo(0, document.body.scrollHeight);
+
+		const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+		isDocumentBottom = Math.ceil(scrollTop + clientHeight) >= scrollHeight;
+		console.log(isDocumentBottom);
+
 		while (true) {
 			try {
 				//@ts-expect-error
@@ -160,7 +171,7 @@
 				textTorender += decode;
 
 				responseElement.innerHTML = DOMPurify.sanitize(textTorender);
-				window.scrollTo(0, document.body.scrollHeight);
+				//window.scrollTo(0, document.body.scrollHeight);
 
 				if (done) {
 					chatHistory.push({
@@ -183,13 +194,45 @@
 			}
 		}
 	};
+
+	function handleWindowScroll() {
+		const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+		isDocumentBottom = !(Math.ceil(scrollTop + clientHeight) >= scrollHeight);
+	}
 </script>
 
+<svelte:window onscroll={handleWindowScroll} />
+
 <main class="chatPage mt-[0.5rem] flex min-h-svh w-full flex-col items-center">
+	{#if isDocumentBottom}
+		<button
+			onclick={() => {
+				window.scrollTo(0, document.body.scrollHeight);
+			}}
+			transition:fly={{ duration: 250, easing: cubicInOut, y: '25px' }}
+			aria-label="Go to bottom"
+			class="fixed bottom-[8rem] z-10 rounded-full bg-stone-900/20 p-2 backdrop-blur-xl"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="27"
+				height="27"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				class="lucide lucide-arrow-down stroke-stone-200"
+				><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></svg
+			>
+		</button>
+	{/if}
 	<div
 		class="z-2 fixed bottom-0 flex w-full justify-between {theme.theme === 'dark'
 			? 'bg-stone-900'
-			: 'sm:bg-transparent bg-stone-800'} sm:outline-hidden gap-x-2 sm:border-none border-t-2 border-stone-600 sm:justify-center"
+			: 'bg-stone-800 sm:bg-transparent'} sm:outline-hidden gap-x-2 border-t-2 border-stone-600 sm:justify-center sm:border-none"
 	>
 		<textarea
 			onkeypress={async (e) => {
@@ -199,7 +242,7 @@
 				generateChat();
 			}}
 			bind:value
-			class="font-generalSans z-2 max-h-[10rem] min-h-[4.5rem] w-[90%] resize-y rounded-none sm:rounded-t-lg bg-stone-900 px-3 py-2 text-stone-300  outline-2 outline-stone-600 sm:w-[90%]"
+			class="font-generalSans z-2 max-h-[10rem] min-h-[4.5rem] w-[90%] resize-y rounded-none bg-stone-900 px-3 py-2 text-stone-300 outline-2 outline-stone-600 sm:w-[90%] sm:rounded-t-lg"
 			placeholder="Type something"
 		></textarea>
 		<button
@@ -209,7 +252,7 @@
 				generateChat();
 			}}
 			aria-labelledby="Send"
-			class="block size-fit mr-1 self-center rounded-full bg-stone-900 p-1 outline-1 outline-stone-700 peer-focus:outline sm:hidden"
+			class="mr-1 block size-fit self-center rounded-full bg-stone-900 p-1 outline-1 outline-stone-700 peer-focus:outline sm:hidden"
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -260,7 +303,7 @@
 		@apply text-2xl! md:text-3xl!;
 	}
 	.chatPage :global(p) {
-		@apply mt-2 text-pretty text-lg! font-medium md:text-xl!;
+		@apply text-lg! md:text-xl! mt-2 text-pretty font-medium;
 	}
 	.chatPage :global(li) {
 		@apply text-base! md:text-lg!;

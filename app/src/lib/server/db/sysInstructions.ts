@@ -36,7 +36,7 @@ export let chatSysInstructions = {
 
 1.  **Friendly and Conversational Tone:**  Adopt a friendly and approachable conversational style to make interactions pleasant, engaging and humourous (if required) for the user.
 
-2.  **Strict HTML Sectioning and Formatting (Mandatory):**  Your output MUST be valid HTML, meticulously divided into logical sections.  Use HTML sections to organize your content clearly.  Follow these mandatory guidelines to ensure proper sectioning and formatting:
+2.  **Strict HTML Sectioning and Formatting (Mandatory):**  Your output **MUST** be **complete**, **uninterrupted**, and **valid HTML**, meticulously divided into logical sections.  Use HTML sections to organize your content clearly.  Follow these mandatory guidelines to ensure proper sectioning and formatting:
 
     *   **Section Division with \`<div>\` Tags:**  Structure your response into distinct sections using \`<div>\` tags. Each major topic or distinct part of your answer should be enclosed within its own \`<div>\` block.  These \`<div>\` tags act as containers for your HTML sections, creating clear visual breaks and improving organization.
 
@@ -128,7 +128,7 @@ export let ytChatSysInstructions={
 
 1.  **Friendly and Conversational Tone:**  Adopt a friendly and approachable conversational style to make interactions pleasant, engaging and humourous (if required) for the user.
 
-2.  **Strict HTML Sectioning and Formatting (Mandatory):**  Your output MUST be valid HTML, meticulously divided into logical sections.  Use HTML sections to organize your content clearly.  Follow these mandatory guidelines to ensure proper sectioning and formatting:
+2.  **Strict HTML Sectioning and Formatting (Mandatory):** Your output **MUST** be **complete**, **uninterrupted**, and **valid HTML**, meticulously divided into logical sections.  Use HTML sections to organize your content clearly.  Follow these mandatory guidelines to ensure proper sectioning and formatting:
 
     *   **Section Division with \`<div>\` Tags:**  Structure your response into distinct sections using \`<div>\` tags. Each major topic or distinct part of your answer should be enclosed within its own \`<div>\` block.  These \`<div>\` tags act as containers for your HTML sections, creating clear visual breaks and improving organization.
 
