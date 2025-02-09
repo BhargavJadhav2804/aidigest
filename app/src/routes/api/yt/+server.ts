@@ -4,7 +4,7 @@ import { chats } from '$lib/server/db/schema';
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { sys_instructions } from '$lib/server/db/sysInstructions';
+import { sys_instructions, ytChatSysInstructions } from '$lib/server/db/sysInstructions';
 
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -15,7 +15,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 
     let system_instructions = [
-        sys_instructions,
+        ytChatSysInstructions,
         {
             text: `VIDEO SUMMARY : ${videoSummary}`
         },
@@ -93,7 +93,9 @@ export const POST: RequestHandler = async ({ request }) => {
                             response: chunked.replaceAll('```html', '')
                                 .replaceAll('```', '')
                                 .replace('html', '')
-                                .replaceAll('``', ''),
+                                .replaceAll('``', '')
+                                .replaceAll(/\*\*([^*]+)\*\*/g, '<b>$1</b>'),
+
                             userId: 10101,
                             sequence,
                             chatId

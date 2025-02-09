@@ -28,13 +28,13 @@ export const POST: RequestHandler = async ({ request }) => {
             text: "For summarizing or answer as an AI summarizer you'll be given a generated summary of the documents provided by user. (The summary will be given as a HTML code, understand it as normal pdf document, analyze it and answer accordingly)  "
         },
         {
-            text: `SUMMARY OF THE DOCUMENT PROVIDED BY THE USER : ${summary}`
+            text: `SUMMARY OF THE DOCUMENT PROVIDED : ${summary}`
         },
         {
             text: 'If the user tries to go off topic or asks something not related to the document or context, kindly give them hint or try to say them to go to the /chat/noraml page for an AI chat'
         },
         {
-            text: "*IMPORTANT* : Ensure the validity of HTML code generated and abide to the instructions given."
+            text: "**IMPORTANT** : Ensure the validity of HTML code generated and abide to the instructions given."
         },
         {
             text: "Do not prompt or tell user that you produce HTML code as response, be a professional yet friendly AI summarizer and assistant."
@@ -153,7 +153,9 @@ export const POST: RequestHandler = async ({ request }) => {
                                 .replaceAll(
                                     '/chat/normal',
                                     '<a href="/chat/normal" class="text-sky-600" > Special AI chat</a> '
-                                ),
+                                )
+                                .replaceAll(/\*\*([^*]+)\*\*/g, '<b>$1</b>'),
+
                             userId: 10101,
                             sequence,
                             chatId

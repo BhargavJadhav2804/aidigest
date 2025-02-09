@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { toast } from '$lib';
 	import { theme } from '$lib/utils.svelte';
+	import { fly } from 'svelte/transition';
 	import type { PageData } from './$types';
 	import DOMPurify from 'dompurify';
+	import { cubicInOut } from 'svelte/easing';
 
 	let { data }: { data: PageData } = $props();
 	console.log(data);
@@ -15,6 +17,8 @@
 	let chatHistory: { role: 'user' | 'model'; parts: Array<{ text: string }> }[] = $state([]);
 	let currentSequence = $state(data.allChats[data.allChats.length - 1].sequence);
 	let newChat = $state(data.allChats.length === 1 ? true : false);
+
+	let isDocumentBottom = $state(false);
 
 	let streamDone = $state(true);
 
@@ -65,7 +69,7 @@
 		let responseElement = document.createElement('div');
 
 		responseElement.className =
-			'chatSection text-chat font-chillax space-y-2 text-wrap hidden rounded-b-2xl rounded-tr-2xl p-4 outline outline-1 outline-lime-500';
+			'chatSection text-chat text-lg font-chillax space-y-2 text-wrap hidden rounded-b-2xl rounded-tr-2xl p-4 outline outline-1 outline-lime-500';
 
 		console.log('UP:', userPrompt);
 
@@ -93,6 +97,10 @@
 			console.log('YT_CHAT_ERROR:', await req.json());
 			return;
 		}
+		const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+		isDocumentBottom = Math.ceil(scrollTop + clientHeight) >= scrollHeight;
+		console.log(isDocumentBottom);
 
 		let reader = req?.body?.getReader();
 
@@ -114,7 +122,6 @@
 				responseElement.classList.remove('hidden');
 
 				responseElement.innerHTML = DOMPurify.sanitize(textTorender);
-				window.scrollTo(0, document.body.scrollHeight);
 
 				if (done) {
 					console.log('Done!');
@@ -134,46 +141,41 @@
 			}
 		}
 	};
+
+	function handleWindowScroll() {
+		const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+		isDocumentBottom = !(Math.ceil(scrollTop + clientHeight) >= scrollHeight);
+	}
 </script>
 
+<svelte:window onscroll={handleWindowScroll} />
+
 <main class=" flex min-h-svh w-full flex-col items-center">
-	<!-- <div
-		class="fixed bottom-0 z-2 flex w-full justify-between {theme.theme === 'dark'
-			? 'bg-stone-900'
-			: 'bg-stone-800'} gap-x-2 outline outline-2 outline-stone-600 sm:justify-center sm:outline-hidden"
-	>
-		<textarea
-			disabled
-			name="prompt"
-			rows="3"
-			placeholder="Type something!"
-			class="font-generalSans peer z-2 max-h-[10rem] min-h-[4rem] w-[95%] resize-y rounded-none border-r-stone-700 {theme.theme ===
-			'dark'
-				? 'bg-stone-900'
-				: 'bg-stone-800'} px-3 py-2 text-stone-300 outline-hidden focus:border-r sm:w-[85%] sm:rounded-t-lg sm:border sm:border-b-0 sm:border-x-stone-700 sm:border-t-stone-700"
-			id=""
-		></textarea>
+	{#if isDocumentBottom}
 		<button
-			aria-labelledby="Send"
-			class="block size-fit self-center rounded-full bg-stone-900 p-1 outline-1 outline-stone-700 peer-focus:outline sm:hidden"
+			onclick={() => {
+				window.scrollTo(0, document.body.scrollHeight);
+			}}
+			transition:fly={{ duration: 250, easing: cubicInOut, y: '25px' }}
+			aria-label="Go to bottom"
+			class="fixed bottom-[8rem] z-10 rounded-full bg-stone-900/20 p-2 backdrop-blur-xl"
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
-				width="24"
-				height="24"
+				width="27"
+				height="27"
 				viewBox="0 0 24 24"
 				fill="none"
 				stroke="currentColor"
 				stroke-width="2"
 				stroke-linecap="round"
 				stroke-linejoin="round"
-				class="lucide lucide-send mt-1 size-8 rotate-[-44deg] stroke-stone-500 md:size-10"
-				><path
-					d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"
-				/><path d="m21.854 2.147-10.94 10.939" /></svg
-			></button
-		>
-	</div> -->
+				class="lucide lucide-arrow-down stroke-stone-200"
+				><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></svg
+			>
+		</button>
+	{/if}
 	<div
 		class="z-2 fixed bottom-0 flex w-full justify-between {theme.theme === 'dark'
 			? 'bg-stone-900 sm:bg-transparent'
@@ -198,7 +200,7 @@
 			class="font-generalSans z-2 peer max-h-[10rem] min-h-[5rem] w-[90%] resize-y rounded-none border-r-stone-600 {theme.theme ===
 			'dark'
 				? 'bg-stone-900'
-				: 'border-r-2 border-r-stone-500 bg-stone-800'} outline-hidden px-3 py-2 text-stone-300 focus:border-r sm:w-[85%] sm:rounded-t-lg sm:border-2 sm:border-b-0 sm:border-x-stone-600 sm:border-t-stone-600"
+				: 'border-r-2 border-r-stone-500 bg-stone-800'} outline-hidden px-3 py-2 text-stone-300 focus:border-r sm:w-[75%] sm:rounded-t-lg sm:border-2 sm:border-b-0 sm:border-x-stone-600 sm:border-t-stone-600"
 			id=""
 		></textarea>
 		<button
@@ -227,7 +229,7 @@
 			></button
 		>
 	</div>
-	<div class="mt-[5rem] flex w-[90%] flex-col items-center gap-y-6 md:w-[85%]">
+	<div class="mt-[5rem] flex w-[90%] flex-col items-center gap-y-6 md:w-[75%]">
 		<iframe
 			class="aspect-video h-full w-full rounded-lg"
 			src={`https://www.youtube.com/embed/${data.allChats[0].ytId}`}
@@ -244,7 +246,7 @@
 			{@html data?.allChats?.[0]?.summary ?? 'Hola'}
 		</div>
 	</div>
-	<div class="chats mb-[6rem] mt-[4rem] flex w-[95%] flex-col justify-center gap-y-4 md:w-[85%]">
+	<div class="chats mb-[6rem] mt-[4rem] flex w-[95%] flex-col justify-center gap-y-4 md:w-[75%]">
 		{#if newChat}
 			<h1 class="text-heading font-satoshi">No chats here yet!</h1>
 		{:else}
@@ -257,7 +259,7 @@
 				</span>
 				<span
 					style:display={chats.response === 'SAME AS SUMMARY' && chats.sequence === 0 ? 'none' : ''}
-					class="chatSection text-chat font-chillax space-y-2 text-wrap rounded-b-2xl rounded-tr-2xl p-4 outline outline-lime-500"
+					class="chatSection text-lg text-chat font-chillax space-y-2 text-pretty break-words rounded-b-2xl rounded-tr-2xl p-4 outline outline-lime-500"
 				>
 					{@html chats.response}
 				</span>
@@ -267,26 +269,30 @@
 </main>
 
 <style scoped>
-	@reference "../../../../app.css"
-	.chats :global(.chatSection) :global(h1) {
-		@apply text-chat text-xl md:text-2xl;
+	@reference "../../../../app.css";
+
+	.chats :global(.chatSection) :global(div) {
+		@apply underline-offset-5 space-y-5 md:space-y-10;
 	}
-	.chats :global(.chatSection) :global(h2) {
-		@apply text-chat text-xl md:text-2xl;
+	.chats :global(.chatSection) :global(h1) {
+		@apply text-chat text-xl! md:text-2xl!;
 	}
 
+	.chats :global(.chatSection) :global(h2) {
+		@apply text-chat text-lg! md:text-xl!;
+	}
 	.chats :global(.chatSection) :global(p) {
-		@apply text-chat text-lg md:text-xl;
+		@apply text-chat text-lg! md:text-xl!;
 	}
 	.chats :global(.chatSection) :global(span) {
-		@apply text-chat text-lg md:text-xl;
+		@apply text-chat text-lg! md:text-xl!;
 	}
 
 	.chats :global(.chatSection) :global(li) {
 		@apply text-chat text-lg;
 	}
 	.chats :global(.chatSection) :global(ul) {
-		@apply text-chat flex flex-col gap-y-3;
+		@apply text-chat flex flex-col gap-y-4;
 	}
 	.chats :global(.chatSection) :global(ol) {
 		@apply text-chat flex flex-col gap-y-3;
@@ -303,28 +309,25 @@
 		@apply rounded-md bg-stone-700 px-1;
 	}
 
-	.chats :global(.chatSection) {
-		@apply text-lg;
-	}
 	.summaryChat {
-		@apply space-y-3;
+		@apply space-y-5;
 	}
 
 	.summaryChat :global(h1) {
 		@apply text-2xl;
 	}
+
+	.summaryChat {
+		@apply underline-offset-6;
+	}
 	.summaryChat :global(h2) {
 		@apply text-xl;
 	}
-	.summaryChat :global(div > *) {
-		@apply mt-3 mb-3;
+
+	.summaryChat :global(ul) {
+		@apply ml-3 space-y-4;
 	}
-	.summaryChat :global(div > ul) {
-		@apply ml-3;
-	}
-	.chats :global(.chatSection) :global(div > *) {
-		@apply mb-3 mt-3;
-	}
+
 	.chats :global(.chatSection) :global(div ul) {
 		@apply ml-3;
 	}
