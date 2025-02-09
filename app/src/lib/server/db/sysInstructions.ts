@@ -64,7 +64,7 @@ export let chatSysInstructions = {
     *   **Strict HTML Compliance:** Using \`<b>\` tags and avoiding Markdown ensures you are producing valid HTML as required.
 
     
-    **Mandatory HTML Section Structure Example:**
+    **Mandatory HTML Section Structure Example to use as reference:**
 
         \`\`\`html
         <div>  
