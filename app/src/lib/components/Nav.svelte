@@ -35,6 +35,10 @@
 		<LOGO />
 
 		<span class="rounded-lg bg-indigo-500 px-2 py-1 font-satoshi"> BETA </span>
+
+	<span class="text-sm rounded-lg bg-indigo-300 px-1 py-1 font-satoshi "> You might experience some issues</span>
+
+
 	</div>
 	<div class="flex items-center">
 		<button
