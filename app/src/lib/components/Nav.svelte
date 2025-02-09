@@ -34,7 +34,7 @@
 	<div class="flex gap-x-4 items-center">
 		<LOGO />
 
-		<span class="md:text-base text-sm rounded-lg bg-indigo-500 px-1 py-1 font-satoshi"> In BETA!, you might experience some issues</span>
+		<span class="md:text-base text-sm rounded-lg bg-indigo-500 px-1 w-fit font-satoshi"> In BETA!, you might experience some issues</span>
 
 
 
