@@ -3,6 +3,7 @@ import { env } from '$env/dynamic/private';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { db } from '$lib/server/db';
 import { chats } from '$lib/server/db/schema';
+import { chatSysInstructions } from '$lib/server/db/sysInstructions';
 import { error, json } from '@sveltejs/kit';
 
 
@@ -54,8 +55,8 @@ export const POST: RequestHandler = async ({ request, url }) => {
 
     const genAI = new GoogleGenerativeAI(env.API_KEY);
     const model = genAI?.getGenerativeModel({
-        model: "gemini-1.5-flash", systemInstruction: {
-            parts: system_instructions,
+        model: "gemini-2.0-flash-lite-preview-02-05", systemInstruction: {
+            parts: [chatSysInstructions],
             role: 'model'
         }
     });
@@ -118,7 +119,8 @@ export const POST: RequestHandler = async ({ request, url }) => {
                             response: chunked.replaceAll('```html', '')
                                 .replaceAll('```', '')
                                 .replace('html', '')
-                                .replaceAll('``', ''),
+                                .replaceAll('``', '')
+                                .replaceAll(/\*\*([^*]+)\*\*/g , '<b>$1</b>'),
                             userId: 10101,
                             sequence,
                             chatId

@@ -3,6 +3,9 @@
 	import { toast } from '$lib';
 	import { theme } from '$lib/utils.svelte';
 	import DOMPurify from 'dompurify';
+	import { onMount } from 'svelte';
+	import { bounceInOut, cubicInOut } from 'svelte/easing';
+	import { fly } from 'svelte/transition';
 
 	let { data, form } = $props();
 
@@ -14,6 +17,8 @@
 	let chatHistory: { role: 'user' | 'model'; parts: Array<{ text: string }> }[] = $state([]);
 	let currentSequence = $state(data.allChats[data.allChats.length - 1].sequence);
 	let newChat = $state(data.allChats.length === 1 ? true : false);
+
+	let isDocumentBottom = $state(false);
 
 	let streamDone = $state(true);
 
@@ -90,12 +95,17 @@
 			console.log(await req.json());
 			return;
 		}
+		const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+		isDocumentBottom = Math.ceil(scrollTop + clientHeight) >= scrollHeight;
+		console.log(isDocumentBottom);
 
 		let reader = req?.body?.getReader();
 
 		document.getElementsByClassName('chats')[0].appendChild(responseElement);
 		while (true) {
 			try {
+				//@ts-expect-error
 				let { done, value } = await reader?.read();
 
 				let decode = new TextDecoder()
@@ -104,14 +114,14 @@
 					.replaceAll('```html', '')
 					.replaceAll('```', '')
 					.replace('html', '')
-					.replaceAll('``', '');
+					.replaceAll('``', '')
+					.replaceAll(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
 
 				textTorender += decode;
 
 				responseElement.classList.remove('hidden');
 
 				responseElement.innerHTML = DOMPurify.sanitize(textTorender);
-				window.scrollTo(0, document.body.scrollHeight);
 
 				if (done) {
 					chatHistory.push({
@@ -131,13 +141,52 @@
 			}
 		}
 	};
+
+	onMount(() => {
+		isDocumentBottom = !(
+			Math.ceil(document.documentElement.scrollTop + document.documentElement.clientHeight) >=
+			document.documentElement.scrollHeight
+		);
+	});
+
+	function handleWindowScroll() {
+		const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+		isDocumentBottom = !(Math.ceil(scrollTop + clientHeight) >= scrollHeight);
+	}
 </script>
 
+<svelte:window onscroll={handleWindowScroll} />
+
 <main class=" flex min-h-svh w-full flex-col items-center">
+	{#if isDocumentBottom}
+		<button
+			onclick={() => {
+				window.scrollTo(0, document.body.scrollHeight);
+			}}
+			transition:fly={{ duration: 250, easing: cubicInOut, y: '25px' }}
+			aria-label="Go to bottom"
+			class="fixed bottom-[8rem] z-10 rounded-full bg-stone-900/20 p-2 backdrop-blur-xl"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="27"
+				height="27"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				class="lucide lucide-arrow-down stroke-stone-200"
+				><path d="M12 5v14" /><path d="m19 12-7 7-7-7" /></svg
+			>
+		</button>
+	{/if}
 	<div
 		class="z-2 fixed bottom-0 flex w-full justify-between {theme.theme === 'dark'
 			? 'bg-stone-900'
-			: 'sm:bg-transparent bg-stone-800'} sm:outline-hidden gap-x-2 sm:border-none border-t-2 border-stone-600 sm:justify-center"
+			: 'bg-stone-800 sm:bg-transparent'} sm:outline-hidden gap-x-2 border-t-2 border-stone-600 sm:justify-center sm:border-none"
 	>
 		<textarea
 			onkeypress={async (e) => {
@@ -158,7 +207,7 @@
 			class="font-generalSans z-2 peer max-h-[10rem] min-h-[4rem] w-[95%] resize-y rounded-none border-r-stone-700 {theme.theme ===
 			'dark'
 				? 'bg-stone-900'
-				: 'bg-stone-800'} outline-hidden px-3 py-2 text-stone-300 focus:border-r sm:w-[85%] sm:rounded-t-lg sm:border sm:border-b-0 sm:border-x-stone-700 sm:border-t-stone-700"
+				: 'bg-stone-800'} outline-hidden px-3 py-2 text-stone-300 focus:border-r sm:w-[75%] sm:rounded-t-lg sm:border sm:border-b-0 sm:border-x-stone-700 sm:border-t-stone-700"
 			id=""
 		></textarea>
 		<button
@@ -168,7 +217,7 @@
 				generateChat();
 			}}
 			aria-labelledby="Send"
-			class="block size-fit mr-1 self-center rounded-full bg-stone-900 p-1 outline-1 outline-stone-700 peer-focus:outline sm:hidden"
+			class="mr-1 block size-fit self-center rounded-full bg-stone-900 p-1 outline-1 outline-stone-700 peer-focus:outline sm:hidden"
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -187,7 +236,7 @@
 			></button
 		>
 	</div>
-	<div class="chats mb-[6rem] mt-[4rem] flex w-[95%] flex-col justify-center gap-y-4 md:w-[85%]">
+	<div class="chats mb-[6rem] mt-[4rem] flex w-[95%] flex-col justify-center gap-y-4 md:w-[75%]">
 		{#if newChat}
 			<h1 class="text-heading m-auto font-mono text-lg italic">No chats here yet!</h1>
 		{:else}
@@ -227,10 +276,10 @@
 	}
 
 	.chats :global(.chatSection) :global(li) {
-		@apply text-chat text-lg;
+		@apply text-chat ml-4 md:ml-5 list-disc text-lg;
 	}
 	.chats :global(.chatSection) :global(ul) {
-		@apply text-chat flex flex-col gap-y-3;
+		@apply text-chat ml-2 flex flex-col gap-y-5;
 	}
 	.chats :global(.chatSection) :global(ol) {
 		@apply text-chat flex flex-col gap-y-3;
@@ -240,16 +289,22 @@
 		@apply w-full overflow-x-auto rounded-lg bg-stone-800 p-1;
 	}
 	.chats :global(.chatSection) :global(pre code) {
-		@apply !overflow-x-scroll bg-transparent text-code-chat;
+		@apply text-code-chat !overflow-x-scroll bg-transparent;
 	}
 
 	.chats :global(.chatSection) :global(code) {
-		@apply rounded-md bg-stone-700 px-1 text-code-chat;
+		@apply text-code-chat rounded-md bg-stone-700 px-1;
 	}
 	.chats :global(.chatSection) :global(section) {
 		@apply mb-4 mt-4;
 	}
 	.chats :global(.chatSection) {
 		@apply text-lg;
+	}
+	.chats :global(.chatSection) :global(div) {
+		@apply underline-offset-3 space-y-7 md:space-y-10;
+	}
+	.chats :global(.chatSection) :global(div div) {
+		@apply space-y-7;
 	}
 </style>
