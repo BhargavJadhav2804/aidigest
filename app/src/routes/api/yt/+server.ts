@@ -15,7 +15,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 
     let system_instructions = [
-       ytChatSysInstructions,
+        ytChatSysInstructions,
         {
             text: `VIDEO SUMMARY : ${videoSummary}`
         },
@@ -93,7 +93,9 @@ export const POST: RequestHandler = async ({ request }) => {
                             response: chunked.replaceAll('```html', '')
                                 .replaceAll('```', '')
                                 .replace('html', '')
-                                .replaceAll('``', ''),
+                                .replaceAll('``', '')
+                                .replaceAll(/\*\*([^*]+)\*\*/g, '<b>$1</b>'),
+
                             userId: 10101,
                             sequence,
                             chatId

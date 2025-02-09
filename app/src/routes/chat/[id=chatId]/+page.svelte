@@ -257,13 +257,13 @@
 	@reference "../../../app.css";
 
 	.chatPage :global(h1) {
-		@apply !text-2xl md:!text-3xl;
+		@apply text-2xl! md:text-3xl!;
 	}
 	.chatPage :global(p) {
-		@apply mt-2 text-pretty !text-lg font-medium md:!text-xl;
+		@apply mt-2 text-pretty text-lg! font-medium md:text-xl!;
 	}
 	.chatPage :global(li) {
-		@apply !text-base md:!text-lg;
+		@apply text-base! md:text-lg!;
 	}
 	.chatPage :global(div) {
 		@apply font-satoshi! hyphens-auto text-pretty break-words;

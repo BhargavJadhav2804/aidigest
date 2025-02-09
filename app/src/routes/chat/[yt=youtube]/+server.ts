@@ -121,7 +121,9 @@ export const POST: RequestHandler = async ({ url, request }) => {
             .replaceAll(
                 '/chat/normal',
                 '<a href="/chat/normal" class="text-sky-600" > Special AI chat</a> '
-            ),
+            )
+            .replaceAll(/\*\*([^*]+)\*\*/g, '<b>$1</b>'),
+
         sequence: 0,
         userId: 10101,
         chatId: Number(chatId),
