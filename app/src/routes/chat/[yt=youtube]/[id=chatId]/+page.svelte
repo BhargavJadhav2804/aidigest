@@ -97,14 +97,18 @@
 			console.log('YT_CHAT_ERROR:', await req.json());
 			return;
 		}
-		const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-
-		isDocumentBottom = Math.ceil(scrollTop + clientHeight) >= scrollHeight;
-		console.log(isDocumentBottom);
 
 		let reader = req?.body?.getReader();
 
 		document.getElementsByClassName('chats')[0].appendChild(responseElement);
+
+		window.scrollTo(0, document.body.scrollHeight);
+
+		const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+		isDocumentBottom = Math.ceil(scrollTop + clientHeight) >= scrollHeight;
+		console.log(isDocumentBottom);
+		
 		while (true) {
 			try {
 				//@ts-expect-error
@@ -259,7 +263,7 @@
 				</span>
 				<span
 					style:display={chats.response === 'SAME AS SUMMARY' && chats.sequence === 0 ? 'none' : ''}
-					class="chatSection text-lg text-chat font-chillax space-y-2 text-pretty break-words rounded-b-2xl rounded-tr-2xl p-4 outline outline-lime-500"
+					class="chatSection text-chat font-chillax space-y-2 text-pretty break-words rounded-b-2xl rounded-tr-2xl p-4 text-lg outline outline-lime-500"
 				>
 					{@html chats.response}
 				</span>

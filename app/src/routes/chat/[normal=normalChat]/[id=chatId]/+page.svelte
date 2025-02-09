@@ -95,14 +95,18 @@
 			console.log(await req.json());
 			return;
 		}
+
+		let reader = req?.body?.getReader();
+
+		document.getElementsByClassName('chats')[0].appendChild(responseElement);
+
+		window.scrollTo(0, document.body.scrollHeight);
+
 		const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
 
 		isDocumentBottom = Math.ceil(scrollTop + clientHeight) >= scrollHeight;
 		console.log(isDocumentBottom);
 
-		let reader = req?.body?.getReader();
-
-		document.getElementsByClassName('chats')[0].appendChild(responseElement);
 		while (true) {
 			try {
 				//@ts-expect-error
@@ -114,8 +118,7 @@
 					.replaceAll('```html', '')
 					.replaceAll('```', '')
 					.replace('html', '')
-					.replaceAll('``', '')
-					.replaceAll(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+					.replaceAll('``', '');
 
 				textTorender += decode;
 
@@ -276,7 +279,7 @@
 	}
 
 	.chats :global(.chatSection) :global(li) {
-		@apply text-chat ml-4 md:ml-5 list-disc text-lg;
+		@apply text-chat ml-4 list-disc text-lg md:ml-5;
 	}
 	.chats :global(.chatSection) :global(ul) {
 		@apply text-chat ml-2 flex flex-col gap-y-5;
