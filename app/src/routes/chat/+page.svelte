@@ -357,6 +357,7 @@
 					class="font-satoshi outline-hidden w-full rounded-lg bg-stone-800 p-2 text-stone-300"
 				/>
 				<button
+					disabled={ytVideoLoading}
 					onclick={async () => {
 						if (!ytLink || ytLink.length === 0) return;
 						ytVideoLoading = true;

@@ -13,6 +13,8 @@ export const POST: RequestHandler = async ({ request }) => {
 
     let { userPrompt, chatHistory, sequence, chatId, ytVideoId, videoSummary } = body
 
+    let ytVideoData = await db.select({ DATA: chats.ytVideoData }).from(chats)
+
 
     let system_instructions = [
         ytChatSysInstructions,
@@ -21,6 +23,9 @@ export const POST: RequestHandler = async ({ request }) => {
         },
         {
             text: `VIDEO ID : ${ytVideoId}`
+        },
+        {
+            text:ytVideoData[0].DATA ?? 'DATA NOT AVAILABLE'
         }
     ]
 
