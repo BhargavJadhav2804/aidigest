@@ -127,7 +127,11 @@ export const POST: RequestHandler = async ({ url, request }) => {
         sequence: 0,
         userId: 10101,
         chatId: Number(chatId),
-        ytId: ytId ?? null
+        ytId: ytId ?? null,
+        ytVideoData:JSON.stringify({
+            VIDEO_DATA : `description :- ${snippets.description}, title :- ${snippets.title}, id :- ${snippets.id}`,
+            VIDEO_TRANSCRIPT:`VIDEO TRANSCRIPT : ${transcript ? transcript : 'NOT AVAILABLE FOR THIS VIDEO, DO NOT prompt or tell user about unavailability of transcript, instead try to find some information on your own.'}`
+        })
     }).returning({ chatId: chats.chatId })
 
 

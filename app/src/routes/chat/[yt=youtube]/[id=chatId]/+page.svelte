@@ -18,6 +18,8 @@
 	let currentSequence = $state(data.allChats[data.allChats.length - 1].sequence);
 	let newChat = $state(data.allChats.length === 1 ? true : false);
 
+	let responseStarted = $state(false);
+
 	let isDocumentBottom = $state(false);
 
 	let streamDone = $state(true);
@@ -108,7 +110,9 @@
 
 		isDocumentBottom = Math.ceil(scrollTop + clientHeight) >= scrollHeight;
 		console.log(isDocumentBottom);
-		
+
+		responseStarted = true;
+
 		while (true) {
 			try {
 				//@ts-expect-error
@@ -119,13 +123,19 @@
 					.replaceAll('```html', '')
 					.replaceAll('```', '')
 					.replace('html', '')
-					.replaceAll('``', '');
+					.replaceAll('``', '')
+					.replaceAll(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
 
 				textTorender += decode;
 
 				responseElement.classList.remove('hidden');
 
 				responseElement.innerHTML = DOMPurify.sanitize(textTorender);
+
+				if (responseStarted) {
+					window.scrollTo(0, document.body.scrollHeight);
+					responseStarted = false;
+				}
 
 				if (done) {
 					console.log('Done!');
@@ -233,7 +243,7 @@
 			></button
 		>
 	</div>
-	<div class="mt-[5rem] flex w-[90%] flex-col items-center gap-y-6 md:w-[75%]">
+	<div class="mt-[5rem] flex w-[100%] flex-col items-center gap-y-6 md:w-[75%]">
 		<iframe
 			class="aspect-video h-full w-full rounded-lg"
 			src={`https://www.youtube.com/embed/${data.allChats[0].ytId}`}
@@ -275,15 +285,18 @@
 <style scoped>
 	@reference "../../../../app.css";
 
+	.chats :global(.chatSection > h1) {
+		@apply underline-offset-5 text-lg! md:text-xl!;
+	}
 	.chats :global(.chatSection) :global(div) {
 		@apply underline-offset-5 space-y-5 md:space-y-10;
 	}
 	.chats :global(.chatSection) :global(h1) {
-		@apply text-chat text-xl! md:text-2xl!;
+		@apply text-chat text-xl md:text-2xl;
 	}
 
 	.chats :global(.chatSection) :global(h2) {
-		@apply text-chat text-lg! md:text-xl!;
+		@apply text-chat text-lg md:text-xl;
 	}
 	.chats :global(.chatSection) :global(p) {
 		@apply text-chat text-lg! md:text-xl!;
@@ -313,8 +326,11 @@
 		@apply rounded-md bg-stone-700 px-1;
 	}
 
+	.summaryChat > :global(div) {
+		@apply space-y-6;
+	}
 	.summaryChat {
-		@apply space-y-5;
+		@apply space-y-6;
 	}
 
 	.summaryChat :global(h1) {

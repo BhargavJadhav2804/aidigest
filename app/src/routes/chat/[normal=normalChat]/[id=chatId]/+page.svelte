@@ -4,12 +4,15 @@
 	import { theme } from '$lib/utils.svelte';
 	import DOMPurify from 'dompurify';
 	import { onMount } from 'svelte';
-	import { bounceInOut, cubicInOut } from 'svelte/easing';
+	import { cubicInOut } from 'svelte/easing';
 	import { fly } from 'svelte/transition';
+	import { MediaQuery } from 'svelte/reactivity';
 
 	let { data, form } = $props();
 
 	let chatError = $state();
+	let isDesktop = new MediaQuery('min-width:800px');
+
 	let prompt = $state('');
 
 	let textTorender = $state('');
@@ -198,6 +201,7 @@
 					//@ts-ignore
 					e.target.value += '\n';
 				} else if (e.key === 'Enter') {
+					if (!isDesktop.current) return;
 					if (!prompt || prompt.length === 0) return;
 					if (!streamDone) return;
 					generateChat();
@@ -211,7 +215,7 @@
 			'dark'
 				? 'bg-stone-900'
 				: 'bg-stone-800'} outline-hidden px-3 py-2 text-stone-300 focus:border-r sm:w-[75%] sm:rounded-t-lg sm:border sm:border-b-0 sm:border-x-stone-700 sm:border-t-stone-700"
-			id=""
+			id="chatInputField"
 		></textarea>
 		<button
 			onclick={() => {
@@ -264,9 +268,13 @@
 <style scoped>
 	@reference "../../../../app.css";
 
-	.chats :global(.chatSection) :global(h1) {
+	.chats :global(.chatSection) :global(div > h1) {
 		@apply text-chat text-xl md:text-2xl;
 	}
+	.chats :global(.chatSection > h1) {
+		@apply text-chat text-lg md:text-xl;
+	}
+
 	.chats :global(.chatSection) :global(h2) {
 		@apply text-chat text-xl md:text-2xl;
 	}
@@ -305,7 +313,7 @@
 		@apply text-lg;
 	}
 	.chats :global(.chatSection) :global(div) {
-		@apply underline-offset-3 space-y-7 md:space-y-10;
+		@apply underline-offset-5 space-y-7 md:space-y-10;
 	}
 	.chats :global(.chatSection) :global(div div) {
 		@apply space-y-7;

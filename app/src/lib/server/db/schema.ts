@@ -28,7 +28,8 @@ export const chats = pgTable('chats', {
 	createdAt: timestamp('created_at').defaultNow().notNull(),
 	updatedAt: timestamp('updated_at').defaultNow().notNull(),
 	sequence: integer('sequence').notNull(),
-	ytId:varchar("ytVideoId",{length:11})
+	ytId:varchar("ytVideoId",{length:11}),
+	ytVideoData:text()
 })
 
 
